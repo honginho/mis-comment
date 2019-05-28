@@ -9,18 +9,39 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>國立中正大學──論文提案書評論系統</title>
+    <title>國立中正大學資管所&醫管所論文提案書評論系統</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
     <script src="jquery-3.4.1.js"></script>
-</head>
-<body>
-    <div>
-        <a href="./index.php" style="margin-bottom: 4px; padding: 2px 4px; border: 1px solid blue;">Index</a>
+    <script src="popper.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <style>
+        #form-check-comments > .form-row > .form-group {
+            padding: 1rem 1rem .5rem;
+            background-color: #f8f8f8;
+            border: 1px solid #e9ecef;
+            border-radius: 0.4rem;
+        }
 
-<?php
-    if (isset($_SESSION['level']) && $_SESSION['level'] == 0) {
-?>
-        <a href="./list.php" style="margin-bottom: 4px; padding: 2px 4px; border: 1px solid blue;">List</a>
-<?php
-    }
-?>
-    </div>
+        .comments-eg {
+            display: inline-block;
+        }
+
+        .btn-comments-eg {
+            margin-right: .5rem;
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-comments-eg:hover {
+            color: #dc3545;
+            background-color: #f8d7da; /* #fbeaec */
+        }
+
+        .comments-eg input[name='comments_codes[]']:checked + .btn-comments-eg {
+            background-color: #dc3545 !important;
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="pt-5" style="background-color: #fefefe; font-family: 'Microsoft JhengHei';">

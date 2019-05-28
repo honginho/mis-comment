@@ -4,7 +4,38 @@ require_once('connect.php');
 require_once('header.php');
 ?>
 
-    <form method="POST">
+<div class="container">
+    <div class="row justify-content-center">
+        <!-- <div style="width: 100%; max-width: 400px;"> -->
+            <div class="card text-center" style="width: 100%; max-width: 400px;">
+                <div class="card-header">
+                    國立中正大學資管所&醫管所論文提案書評論系統
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <input type="text" id="account" class="form-control" name="account" placeholder="帳號" required autofocus>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <input type="password" id="password" class="form-control" name="password" placeholder="密碼" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">
+                            登入
+                        </button>
+                    </form>
+                </div>
+            </div>
+        <!-- </div> -->
+    </div>
+</div>
+
+
+
+    <!-- <form method="POST">
         <label for="account">帳號</label>
         <input type="text" name="account" id="account">
 
@@ -12,7 +43,7 @@ require_once('header.php');
         <input type="password" name="password" id="password">
 
         <input type="submit" value="送出">
-    </form>
+    </form> -->
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
