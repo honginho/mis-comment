@@ -23,7 +23,7 @@ session_start();
         }
 
         .comments-eg {
-            display: inline-block;
+            display: block;
         }
 
         .btn-comments-eg {

@@ -17,9 +17,9 @@ if (isset($_GET['comments_id'])) {
 ?>
     <script>
         function cancelComment() {
-            if (confirm('確定要回上一頁嗎？若選擇確定，剛剛新增或修改的動作將不被記錄。') == true) {
+            // if (confirm('確定要回上一頁嗎？若選擇確定，剛剛新增或修改的動作將不被記錄。') == true) {
                 window.location.href = 'index.php';
-            }
+            // }
         }
 
         function collectComments(currentID) {
@@ -136,6 +136,25 @@ if (isset($_GET['comments_id'])) {
             </div>
         </div>
     </div>
+    <div class="modal fade" id="quitCommentModal" tabindex="-1" role="dialog" aria-labelledby="checkModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">訊息視窗</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    確定要回上一頁嗎？<br>若選擇確定，剛剛新增或修改的動作將<mark class="text-danger font-weight-bold">不被記錄</mark>。
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-light" onclick="cancelComment();">確定</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="card">
@@ -143,7 +162,7 @@ if (isset($_GET['comments_id'])) {
                 <b>國立中正大學資管所&醫管所論文提案書評論系統</b>
                 <form>
                     <input type="button" class="btn btn-sm btn-light" value="<?php echo $_SESSION['account']; ?>" disabled>
-                    <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" onclick="cancelComment()">
+                    <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" data-toggle="modal" data-target="#quitCommentModal" onclick="return false; /*cancelComment();">
                     <input type="button" class="btn btn-sm btn-success" value="結束評論" data-toggle="modal" data-target="#checkModal" onclick="collectComments(<?php echo $id; ?>)">
                 </form>
             </div>
