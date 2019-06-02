@@ -23,9 +23,47 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 </form>
             </div>
             <div class="card-body table-responsive">
+                <form class="form-inline mb-3" action="list.php" method="GET">
+                    <div class="form-group mr-1 mr-sm-3">
 <?php
-        $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `status` = 0 OR `status` = 1');
-        $stmt->execute();
+    $val = (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != '') ? $_GET['condition_stu'] : '';
+?>
+                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字" value="<?php echo $val; ?>">
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-success" type="submit" value="查詢">
+                    </div>
+                </form>
+<?php
+        if (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != '') {
+            $stu = htmlspecialchars($_GET['condition_stu']);
+
+            $stmt = $conn->prepare('SELECT `id`, `name` FROM `stu` WHERE `name` LIKE CONCAT("%", ?, "%")');
+            // 會出錯：$stmt->bind_param('s', '%'.$stu.'%');
+            $stmt->bind_param('s', $stu);
+            $stmt->execute();
+            $result_stu = $stmt->get_result();
+            $stmt->close();
+            $rows_stu = mysqli_num_rows($result_stu);
+            if ($rows_stu > 0) {
+                $condition = '';
+                for ($i = 0; $i < $rows_stu; $i++) {
+                    $data_stu = mysqli_fetch_assoc($result_stu);
+                    $split = ($i == 0) ? '' : ' OR ';
+                    $condition .= $split . '`stu_id` = ' . $data_stu['id'];
+                }
+                $stmt = $conn->prepare('SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND (' . $condition . ')');
+                $stmt->execute();
+            }
+            else {
+                echo '<b>沒有學生。</b>';
+                die();
+            }
+        }
+        else {
+            $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `status` = 0 OR `status` = 1');
+            $stmt->execute();
+        }
         $result = $stmt->get_result();
         $stmt->close();
         $rows = mysqli_num_rows($result);
