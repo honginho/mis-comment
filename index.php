@@ -9,8 +9,6 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     }
     else {
         $prof_id = $_SESSION['prof_id'];
-        // $prof_name = $_SESSION['account'];
-        // echo 'ID: ' . $prof_id . '<br>';
 ?>
 
     <div class="container">
@@ -45,14 +43,10 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 <?php
             for ($i = 0; $i < $rows; $i++) {
                 $comments = mysqli_fetch_assoc($result);
-                // var_dump($comments); die();
                 $id = $comments['id'];
                 $prof_id = $comments['prof_id'];
                 $stu_id = $comments['stu_id'];
                 $status = $comments['status'];
-                // echo 'comments_id: ' . $id . '<br>';
-                // echo 'prof_id: ' . $prof_id . '<br>';
-                // echo 'stu_id: ' . $stu_id . '<br>';
                 $stmt = $conn->prepare('SELECT * FROM `stu` WHERE `id` = ?');
                 $stmt->bind_param('i', $stu_id);
                 $stmt->execute();

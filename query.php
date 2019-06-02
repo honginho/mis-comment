@@ -13,7 +13,7 @@ if (isset($_GET['comments_id'])) {
     $result = $stmt->get_result();
     $stmt->close();
     $rows = mysqli_num_rows($result);
-    if ($rows == 1) {
+    if ($rows == 1 || $_SESSION['level'] == 0) {
 ?>
     <script>
         function cancelComment() {
@@ -136,6 +136,8 @@ if (isset($_GET['comments_id'])) {
             </div>
         </div>
     </div>
+
+<?php if ($_SESSION['level'] == 1): ?>
     <div class="modal fade" id="quitCommentModal" tabindex="-1" role="dialog" aria-labelledby="checkModal" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -155,6 +157,7 @@ if (isset($_GET['comments_id'])) {
             </div>
         </div>
     </div>
+<?php endif; ?>
 
     <div class="container">
         <div class="card">
@@ -162,8 +165,12 @@ if (isset($_GET['comments_id'])) {
                 <b>國立中正大學資管所&醫管所論文提案書評論系統</b>
                 <form>
                     <input type="button" class="btn btn-sm btn-light" value="<?php echo $_SESSION['account']; ?>" disabled>
-                    <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" data-toggle="modal" data-target="#quitCommentModal" onclick="return false; /*cancelComment();">
+<?php if ($_SESSION['level'] == 1): ?>
+                    <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" data-toggle="modal" data-target="#quitCommentModal" onclick="return false;">
                     <input type="button" class="btn btn-sm btn-success" value="結束評論" data-toggle="modal" data-target="#checkModal" onclick="collectComments(<?php echo $id; ?>)">
+<?php else: ?>
+                    <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" onclick="cancelComment()">
+<?php endif; ?>
                 </form>
             </div>
 <?php
@@ -216,9 +223,11 @@ if (isset($_GET['comments_id'])) {
         }
 ?>
             <div class="card-body">
+<?php if ($_SESSION['level'] == 1): ?>
                 <div class="alert alert-primary" role="alert">
                     點選以選取評論範例。
                 </div>
+<?php endif; ?>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
 <?php
@@ -235,8 +244,12 @@ if (isset($_GET['comments_id'])) {
 ?>
                     </div>
                 </nav>
+<?php if ($_SESSION['level'] == 1): ?>
                 <div class="tab-content mt-3" id="nav-tabContent">
-<?php
+<?php else: ?>
+                <div class="tab-content mt-3" id="nav-tabContent" style="pointer-events: none;">
+<?php endif;
+
         for ($i = 0; $i < count($arr_comments_all); $i++) {
             $active = ($i == 0) ? 'active' : '';
 ?>
@@ -265,8 +278,12 @@ if (isset($_GET['comments_id'])) {
             </div>
             <div class="card-footer text-right">
                 <form>
-                    <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" onclick="cancelComment()">
+<?php if ($_SESSION['level'] == 1): ?>
+                    <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" data-toggle="modal" data-target="#quitCommentModal" onclick="return false;">
                     <input type="button" class="btn btn-sm btn-success" value="結束評論" data-toggle="modal" data-target="#checkModal" onclick="collectComments(<?php echo $id; ?>)">
+<?php else: ?>
+                    <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" onclick="cancelComment()">
+<?php endif; ?>
                 </form>
             </div>
         </div>
