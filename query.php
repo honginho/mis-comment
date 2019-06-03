@@ -138,7 +138,7 @@ if (isset($_GET['comments_id'])) {
     </div>
 
 <?php if ($_SESSION['level'] == 1): ?>
-    <div class="modal fade" id="quitCommentModal" tabindex="-1" role="dialog" aria-labelledby="checkModal" aria-hidden="true">
+    <div class="modal fade" id="quitCommentModal" tabindex="-1" role="dialog" aria-labelledby="quitCommentModal" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
