@@ -298,10 +298,8 @@ if (isset($_GET['comments_id'])) {
                 }
 
                 let otherComments = '<?php echo $comments_details["other_comment"]; ?>'.split('@,|,@');
-                console.log(otherComments);
                 for (let i = 0; i < otherComments.length; i++) {
                     otherCommentsDetails = otherComments[i].split('@-|-@');
-                    console.log(otherCommentsDetails)
                     $('.other-comment[data-index="' + otherCommentsDetails[0] + '"]').text(otherCommentsDetails[1]);
                 }
             </script>
