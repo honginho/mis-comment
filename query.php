@@ -22,6 +22,23 @@ if (isset($_GET['comments_id'])) {
             // }
         }
 
+        function copyFunction(id) {
+            // let self = $('label[for="comments-' + id + '"]');
+            // self.select();
+            // document.execCommand('Copy');
+            // console.log('Copied the text: ' + self.text());
+            // let str = $('label[for="comments-' + id + '"]').text();
+            let str = document.querySelector('label[for="comments-' + id + '"]').textContent;
+            console.log('str', str)
+            const el = document.createElement('textarea');
+            el.value = str;
+            console.log('str2', el.value)
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        }
+
         function collectComments(currentID) {
             // `otherCommentsIndexRecord`：type(id) 記錄有哪些`其他評論`
             let otherComments = $('.tab-content .other-comment');
@@ -54,7 +71,9 @@ if (isset($_GET['comments_id'])) {
                         tmp += `
                             <div class="comments-eg">
                                 <input type="checkbox" name="comments_codes[]" value="${id}" checked style="display: none;">
-                                <label class="btn btn-comments-eg text-left" for="comments-${id}" style="pointer-events: none;">${detail}</label>
+                                <div class="form-group">
+                                    <input type="text" class="btn text-left" style="background-color: #dc3545; border: 1px solid #dc3545; color: white; font-weight: bold;" for="comments-${id}" value="${detail}" readonly>
+                                </div>
                             </div>
                         `;
                     }
@@ -170,6 +189,7 @@ if (isset($_GET['comments_id'])) {
                     <input type="button" class="btn btn-sm btn-success" value="結束評論" data-toggle="modal" data-target="#checkModal" onclick="collectComments(<?php echo $id; ?>)">
 <?php else: ?>
                     <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" onclick="cancelComment()">
+                    <input type="button" class="btn btn-sm btn-success" value="查看評論" data-toggle="modal" data-target="#checkModal" onclick="collectComments(<?php echo $id; ?>)">
 <?php endif; ?>
                 </form>
             </div>
@@ -283,6 +303,7 @@ if (isset($_GET['comments_id'])) {
                     <input type="button" class="btn btn-sm btn-success" value="結束評論" data-toggle="modal" data-target="#checkModal" onclick="collectComments(<?php echo $id; ?>)">
 <?php else: ?>
                     <input type="button" class="btn btn-sm btn-secondary" value="回上一頁" onclick="cancelComment()">
+                    <input type="button" class="btn btn-sm btn-success" value="查看評論" data-toggle="modal" data-target="#checkModal" onclick="collectComments(<?php echo $id; ?>)">
 <?php endif; ?>
                 </form>
             </div>

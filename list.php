@@ -25,13 +25,13 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             <div class="card-body table-responsive">
                 <form class="form-inline mb-3" action="list.php" method="GET">
                     <div class="form-group mr-1 mr-sm-3">
-<?php
-    $val = (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != '') ? $_GET['condition_stu'] : '';
-?>
-                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字" value="<?php echo $val; ?>">
+                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字" autofocus>
                     </div>
                     <div class="form-group">
                         <input class="btn btn-success" type="submit" value="查詢">
+<?php if (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != ''): ?>
+                        <input type="button" class="btn btn-light" value="查詢：<?php echo $_GET['condition_stu']; ?>" disabled>
+<?php endif; ?>
                     </div>
                 </form>
 <?php
@@ -73,7 +73,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     <thead>
                         <tr>
                             <th scope="col">學生</th>
-                            <th scope="col">學號</th>
+                            <th scope="col">評論教授</th>
                             <th scope="col">論文名稱</th>
                             <th scope="col"></th>
                         </tr>
@@ -86,17 +86,28 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 $prof_id = $comments['prof_id'];
                 $stu_id = $comments['stu_id'];
                 $status = $comments['status'];
+
+                // 抓教授姓名
+                $stmt = $conn->prepare('SELECT `id`, `name` FROM `prof` WHERE `id` = ?');
+                $stmt->bind_param('i', $prof_id);
+                $stmt->execute();
+                $result_name_prof = $stmt->get_result();
+                $stmt->close();
+                // $rows_name_prof = mysqli_num_rows($result_name_prof);
+                $prof = mysqli_fetch_assoc($result_name_prof);
+
+                // 抓學生資料
                 $stmt = $conn->prepare('SELECT * FROM `stu` WHERE `id` = ?');
                 $stmt->bind_param('i', $stu_id);
                 $stmt->execute();
                 $result_data_stu = $stmt->get_result();
                 $stmt->close();
-                $rows_data_stu = mysqli_num_rows($result_data_stu);
+                // $rows_data_stu = mysqli_num_rows($result_data_stu);
                 $stu = mysqli_fetch_assoc($result_data_stu);
 ?>
                         <tr>
                             <td><?php echo $stu['name']; ?></td>
-                            <td><?php echo $stu['stu_id']; ?></td>
+                            <td><?php echo $prof['name']; ?></td>
                             <td><?php echo $stu['project']; ?></td>
                             <td style="padding: 0.5rem;">
                                 <form action="query.php">
