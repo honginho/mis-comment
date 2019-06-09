@@ -28,9 +28,9 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字" autofocus>
                     </div>
                     <div class="form-group">
-                        <input class="btn btn-success" type="submit" value="查詢">
+                        <input class="btn btn-success" type="submit" value="查詢學生">
 <?php if (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != ''): ?>
-                        <input type="button" class="btn btn-light" value="查詢：<?php echo $_GET['condition_stu']; ?>" disabled>
+                        <input type="button" class="btn btn-light" value="查詢結果：<?php echo $_GET['condition_stu']; ?>" disabled>
 <?php endif; ?>
                     </div>
                 </form>
