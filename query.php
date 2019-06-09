@@ -22,23 +22,6 @@ if (isset($_GET['comments_id'])) {
             // }
         }
 
-        function copyFunction(id) {
-            // let self = $('label[for="comments-' + id + '"]');
-            // self.select();
-            // document.execCommand('Copy');
-            // console.log('Copied the text: ' + self.text());
-            // let str = $('label[for="comments-' + id + '"]').text();
-            let str = document.querySelector('label[for="comments-' + id + '"]').textContent;
-            console.log('str', str)
-            const el = document.createElement('textarea');
-            el.value = str;
-            console.log('str2', el.value)
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-        }
-
         function collectComments(currentID) {
             // `otherCommentsIndexRecord`：type(id) 記錄有哪些`其他評論`
             let otherComments = $('.tab-content .other-comment');
@@ -70,10 +53,12 @@ if (isset($_GET['comments_id'])) {
                         let id = i + '-' + (j+1);
                         tmp += `
                             <div class="comments-eg">
+<?php if ($_SESSION['level'] == 1): ?>
                                 <input type="checkbox" name="comments_codes[]" value="${id}" checked style="display: none;">
-                                <div class="form-group">
-                                    <input type="text" class="btn text-left" style="background-color: #dc3545; border: 1px solid #dc3545; color: white; font-weight: bold;" for="comments-${id}" value="${detail}" readonly>
-                                </div>
+                                <label class="btn btn-comments-eg text-left" for="comments-${id}" style="pointer-events: none;">${detail}</label>
+<?php elseif ($_SESSION['level'] == 0): ?>
+                                <p class="btn text-left" style="display: inline-block; background-color: #dc3545; border: 1px solid #dc3545; color: white; font-weight: bold; -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;" for="comments-${id}">${detail}</p>
+<?php endif; ?>
                             </div>
                         `;
                     }
@@ -150,7 +135,9 @@ if (isset($_GET['comments_id'])) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">繼續修改</button>
+<?php if ($_SESSION['level'] == 1): ?>
                     <button type="button" class="btn btn-success" onclick="$('#form-check-comments').submit();">確定儲存</button>
+<?php endif; ?>
                 </div>
             </div>
         </div>
