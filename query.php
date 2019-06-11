@@ -17,12 +17,15 @@ if (isset($_GET['comments_id'])) {
 ?>
     <script>
         function cancelComment() {
+            console.log('Fine, cancel comments');
             // if (confirm('確定要回上一頁嗎？若選擇確定，剛剛新增或修改的動作將不被記錄。') == true) {
                 window.location.href = 'index.php';
             // }
         }
 
         function collectComments(currentID) {
+            console.log('Let\'s collect comments');
+
             // `otherCommentsIndexRecord`：type(id) 記錄有哪些`其他評論`
             let otherComments = $('.tab-content .other-comment');
             let otherCommentsIndexRecord = '';
