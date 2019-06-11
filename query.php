@@ -305,6 +305,9 @@ if (isset($_GET['comments_id'])) {
                     $('#comments-' + comments[i]).prop("checked", true);
                 }
 
+                console.log('comments: \n', '<?php echo $comments_details['comment']; ?>');
+                console.log('otherComments: \n', '<?php echo $comments_details["other_comment"]; ?>');
+
                 let otherComments = '<?php echo $comments_details["other_comment"]; ?>'.split('@,|,@');
                 for (let i = 0; i < otherComments.length; i++) {
                     otherCommentsDetails = otherComments[i].split('@-|-@');
