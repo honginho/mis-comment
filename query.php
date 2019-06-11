@@ -51,16 +51,20 @@ if (isset($_GET['comments_id'])) {
                     if (commentEg.eq(j).find('input').prop('checked')) {
                         let detail = commentEg.eq(j).find('label').text();
                         let id = i + '-' + (j+1);
+<?php if ($_SESSION['level'] == 1): ?>
                         tmp += `
                             <div class="comments-eg">
-<?php if ($_SESSION['level'] == 1): ?>
                                 <input type="checkbox" name="comments_codes[]" value="${id}" checked style="display: none;">
                                 <label class="btn btn-comments-eg text-left" for="comments-${id}" style="pointer-events: none;">${detail}</label>
-<?php elseif ($_SESSION['level'] == 0): ?>
-                                <p class="btn text-left" style="display: inline-block; background-color: #dc3545; border: 1px solid #dc3545; color: white; font-weight: bold; -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;" for="comments-${id}">${detail}</p>
-<?php endif; ?>
                             </div>
                         `;
+<?php elseif ($_SESSION['level'] == 0): ?>
+                        tmp += `
+                            <div class="comments-eg">
+                                <p class="btn text-left" style="display: inline-block; background-color: #dc3545; border: 1px solid #dc3545; color: white; font-weight: bold; -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto;" for="comments-${id}">${detail}</p>
+                            </div>
+                        `;
+<?php endif; ?>
                     }
                 }
                 let otherCommentDetail = commentsPane.eq(i).find('.form-group textarea').val();
