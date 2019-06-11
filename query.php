@@ -245,6 +245,7 @@ if (isset($_GET['comments_id'])) {
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
 <?php
+        var_dump($arr_comments_all); die();
         for ($i = 0; $i < count($arr_comments_all); $i++) {
             $m = $arr_comments_all[$i][0][0]; // `main`
             $s = $arr_comments_all[$i][0][1]; // `sub`
@@ -311,9 +312,6 @@ if (isset($_GET['comments_id'])) {
                 for (let i  = 0; i < comments.length; i++) {
                     $('#comments-' + comments[i]).prop("checked", true);
                 }
-
-                console.log('comments: \n', '<?php echo $comments_details['comment']; ?>');
-                console.log('otherComments: \n', '<?php echo $comments_details["other_comment"]; ?>');
 
                 let otherComments = '<?php echo $comments_details["other_comment"]; ?>'.split('@,|,@');
                 for (let i = 0; i < otherComments.length; i++) {
