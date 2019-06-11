@@ -245,7 +245,6 @@ if (isset($_GET['comments_id'])) {
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
 <?php
-        // var_dump($arr_comments_all); die();
         for ($i = 0; $i < count($arr_comments_all); $i++) {
             $m = $arr_comments_all[$i][0][0]; // `main`
             $s = $arr_comments_all[$i][0][1]; // `sub`
