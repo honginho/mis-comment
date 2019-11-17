@@ -60,7 +60,7 @@
         // TODO: 印出有重複的給管理員看
         
         //新增評論資料
-        $addcomment = "SELECT `id` FROM prof 
+        // $addcomment = "SELECT `id` FROM prof 
 
         mysqli_query($conn,$add);
     }
