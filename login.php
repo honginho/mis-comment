@@ -37,15 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo '帳號密碼皆不能空白。';
     }
     else {
-        $user = htmlspecialchars($_POST['account']);
+        $user = htmlspecialchars($_POST['account']); //將引號與雙引號轉為純顯示
         $pwd = htmlspecialchars($_POST['password']);
         $stmt = $conn->prepare("SELECT * FROM `prof` WHERE `account` = ? && `password` = ?");
         $stmt->bind_param('ss', $user, $pwd);
         $stmt->execute();
-        $result = $stmt->get_result();
+        $result = $stmt->get_result(); //$result???
         $stmt->close();
         $rows = mysqli_num_rows($result);
-        $prof = mysqli_fetch_assoc($result);
+        $prof = mysqli_fetch_assoc($result); //從$result取得一行做關聯數據
 
         if ($rows == 1) {
             $_SESSION['prof_id'] = $prof['id'];

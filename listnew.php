@@ -23,42 +23,63 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 </form>
             </div>
             <div class="card-body table-responsive">
-                <form class="form-inline mb-3" action="list.php" method="GET">
+                <form class="form-inline mb-3" action="listnew.php" method="GET"> <!-- 查詢全部的表單 -->
                     <div class="form-group mr-1 mr-sm-3">
-                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字" autofocus>
+                        <input type="text" class="form-control" name="condition_all" placeholder="請輸入關鍵字" autofocus>
                     </div>
                     <div class="form-group" style="display:inline;">
-                        <input class="btn btn-success" type="submit" value="查詢學生">
-<?php if (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != ''): ?>
-                        <input type="button" class="btn btn-light" value="查詢結果：<?php echo $_GET['condition_stu']; ?>" disabled>
+                        <input class="btn btn-success" type="submit" value="查詢全部">
+<?php if (isset($_GET['condition_all']) && trim($_GET['condition_all']) != ''): ?>
+                        <input type="button" class="btn btn-light" value="查詢結果：<?php echo $_GET['condition_all']; ?>" disabled>
 <?php endif; ?>
                     </div>
                 </form>
+                
+                <form action="upload.php" method="post" enctype="multipart/form-data" style="margin-bottom: 10px;"> <!-- 上傳檔案的表單 -->
+                    檔案名稱:<input type="file" name="file" id="file"/>
+                    <input class="btn btn-primary" type="submit" name="submit" value="上傳檔案"/>
+                </form>
 <?php
-        if (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != '') {
-            $stu = htmlspecialchars($_GET['condition_stu']);
-            
-            $stmt = $conn->prepare('SELECT `id`, `name` FROM `stu` WHERE `name` LIKE CONCAT("%", ?, "%")');
-            // 會出錯：$stmt->bind_param('s', '%'.$stu.'%');
-            $stmt->bind_param('s', $stu);
+        if (isset($_GET['condition_all']) && trim($_GET['condition_all']) != '') { //若搜尋框內有接收到東西
+            $all = htmlspecialchars($_GET['condition_all']); //將搜尋關鍵字化成單純可讀
+
+            $stmt = $conn->prepare('SELECT `id`, `name` FROM `stu` WHERE `name` LIKE CONCAT("%", ?, "%")'); //模糊查詢
+            $stmt->bind_param('s', $all);
             $stmt->execute();
             $result_stu = $stmt->get_result();
-            $stmt->close();
-            $rows_stu = mysqli_num_rows($result_stu);
-            if ($rows_stu > 0) {
-                $condition = '';
-                for ($i = 0; $i < $rows_stu; $i++) {
-                    $data_stu = mysqli_fetch_assoc($result_stu);
-                    $split = ($i == 0) ? '' : ' OR ';
-                    $condition .= $split . '`stu_id` = ' . $data_stu['id'];
+            // var_dump($result_stu);
+            // echo '<br>';
+
+            $stmt = $conn->prepare('SELECT `id`, `name` FROM `prof` WHERE `name` LIKE CONCAT("%", ?, "%")');
+            $stmt->bind_param('s', $all);
+            $stmt->execute();
+            $result_prof = $stmt->get_result();
+            // var_dump($result_prof);
+            // $stmt->close();
+
+            $rows_prof = mysqli_num_rows($result_prof);
+            $rows_stu =  mysqli_num_rows($result_stu);
+            if($rows_prof + $rows_stu > 0){
+                if($rows_prof > 0){
+                    $condition = "";
+                    for($i = 0; $i < $rows_prof;$i++){
+                        $data_prof = mysqli_fetch_assoc($result_prof);
+                        $split = ($i == 0) ? '' : ' OR ';
+                        $condition .= $split .'`prof_id` = '.$data_prof['id'];
+                    }
                 }
-               // echo $condition;
-                $stmt = $conn->prepare('SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND (' . $condition . ')');
-                echo 'SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND (' . $condition . ')';
+                if($rows_stu > 0){
+                    $condition = "";
+                    for($i = 0; $i < $rows_stu;$i++){
+                        $data_stu = mysqli_fetch_assoc($result_stu);
+                        $condition .='`stu_id` = '.$data_stu['id'];
+                    }
+                }
+                $stmt = $conn->prepare('SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND ('.$condition.')');
                 $stmt->execute();
             }
             else {
-                echo '<b>沒有學生。</b>';
+                echo '<b>查無結果。</b>';
                 die();
             }
         }
