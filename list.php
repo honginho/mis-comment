@@ -25,7 +25,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             <div class="card-body table-responsive">
                 <form class="form-inline mb-3" action="list.php" method="GET">
                     <div class="form-group mr-1 mr-sm-3">
-                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字" autofocus>
+                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字" required autofocus>
                     </div>
                     <div class="form-group" style="display:inline;">
                         <input class="btn btn-success" type="submit" value="查詢學生">
@@ -37,7 +37,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 <?php
         if (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != '') {
             $stu = htmlspecialchars($_GET['condition_stu']);
-            
+
             $stmt = $conn->prepare('SELECT `id`, `name` FROM `stu` WHERE `name` LIKE CONCAT("%", ?, "%")');
             // 會出錯：$stmt->bind_param('s', '%'.$stu.'%');
             $stmt->bind_param('s', $stu);
@@ -75,13 +75,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     <thead>
                         <tr>
                             <th scope="col">學生</th>
-                            <th scope="col">評論教授</th>
                             <th scope="col">論文名稱</th>
-                            <th scope="col"></th>
+                            <th scope="col">評論教授</th>
                         </tr>
                     </thead>
                     <tbody>
 <?php
+            $comments_formatted_data = array();
+
             for ($i = 0; $i < $rows; $i++) {
                 $comments = mysqli_fetch_assoc($result);
                 $id = $comments['id'];
@@ -89,38 +90,101 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 $stu_id = $comments['stu_id'];
                 $status = $comments['status'];
 
-                // 抓教授姓名
+                // prof: get `name` by `id`
                 $stmt = $conn->prepare('SELECT `id`, `name` FROM `prof` WHERE `id` = ?');
                 $stmt->bind_param('i', $prof_id);
                 $stmt->execute();
                 $result_name_prof = $stmt->get_result();
                 $stmt->close();
-                // $rows_name_prof = mysqli_num_rows($result_name_prof);
-                $prof = mysqli_fetch_assoc($result_name_prof);
+                $rows_name_prof = mysqli_num_rows($result_name_prof);
 
-                // 抓學生資料
+                // stu: get `name` by `id`
                 $stmt = $conn->prepare('SELECT * FROM `stu` WHERE `id` = ?');
                 $stmt->bind_param('i', $stu_id);
                 $stmt->execute();
                 $result_data_stu = $stmt->get_result();
                 $stmt->close();
-                // $rows_data_stu = mysqli_num_rows($result_data_stu);
-                $stu = mysqli_fetch_assoc($result_data_stu);
+                $rows_data_stu = mysqli_num_rows($result_data_stu);
+
+                if ($rows_name_prof == 1 && $rows_data_stu == 1) { // stu/prof 資料必需都要剛好只有一筆
+                    $prof = mysqli_fetch_assoc($result_name_prof);
+                    $stu = mysqli_fetch_assoc($result_data_stu);
+
+                    /* format comments data for frontend render:
+                     *   array(
+                     *     array(
+                     *       stu => [student_name],
+                     *       prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
+                     *       project => [project_name]
+                     *     ),
+                     *     array(
+                     *       stu => [student_name],
+                     *       prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
+                     *       project => [project_name]
+                     *     ),
+                     *     ......
+                     *   )
+                     */
+                    $tmp = array();
+                    $length_formatted_data = count($comments_formatted_data);
+                    if ($length_formatted_data > 0) {
+                        $count = 0;
+                        for ($j = 0; $j < $length_formatted_data; $j++) {
+                            // need not push new formatted data while student name are duplicate
+                            if ($comments_formatted_data[$j]['stu'] == $stu['name']) {
+                                $comments_formatted_data[$j]['prof'] .= "," . $prof['name'] . "-$id-$status";
+                                break;
+                            }
+                            $count++;
+                        }
+
+                        // push new formatted data while student name aren't duplicate
+                        if ($count == $length_formatted_data) {
+                            $tmp['stu'] = $stu['name'];
+                            $tmp['prof'] = $prof['name'] . "-$id-$status";
+                            $tmp['project'] = $stu['project'];
+                            array_push($comments_formatted_data, $tmp);
+                        }
+                    }
+                    else {
+                        $tmp['stu'] = $stu['name'];
+                        $tmp['prof'] = $prof['name'] . "-$id-$status";
+                        $tmp['project'] = $stu['project'];
+                        array_push($comments_formatted_data, $tmp);
+                    }
+                }
+                else {
+                    // unable to get stu/prof data, or data duplication
+                    echo '<b>資料出錯，請聯絡管理員。</b>';
+                }
+            }
+
+            // render formatted data to frontend
+            foreach ($comments_formatted_data as $single_data) {
 ?>
                         <tr>
-                            <td><?php echo $stu['name']; ?></td>
-                            <td><?php echo $prof['name']; ?></td>
-                            <td><?php echo $stu['project']; ?></td>
-                            <td style="padding: 0.5rem;">
-                                <form action="query.php">
-                                    <input type="hidden" name="comments_id" value="<?php echo $id; ?>">
+                            <td><?php echo $single_data['stu']; ?></td>
+                            <td><?php echo $single_data['project']; ?></td>
+                            <td style="padding: 0.5rem; display: flex;">
 <?php
-                if ($status == 1)
-                    echo '<input class="btn btn-sm btn-success" type="submit" value="查看評論">';
-                else
-                    echo '<input class="btn btn-sm btn-outline-danger" type="submit" value="尚未評論" disabled>';
+                $prof_array = explode(',', $single_data['prof']);
+                foreach ($prof_array as $single_prof) {
+                    $professor_name = explode('-', $single_prof)[0];
+                    $comment_id = explode('-', $single_prof)[1];
+                    $comment_status = explode('-', $single_prof)[2];
+
+                    // ($comment_status == 1): already commented
+                    $btn_css = ($comment_status == 1) ? 'btn-success': 'btn-outline-secondary';
+                    $btn_title = ($comment_status == 1) ? '查看評論': '尚未評論';
+                    $btn_disabled = ($comment_status == 1) ? '': 'disabled';
 ?>
+                                <form action="query.php" style="padding: 0 0.5rem;">
+                                    <input type="hidden" name="comments_id" value="<?php echo $comment_id; ?>">
+                                    <input class="btn btn-sm <?php echo $btn_css; ?>" title="<?php echo $btn_title; ?>" <?php echo $btn_disabled; ?> type="submit" value="<?php echo $professor_name; ?>">
                                 </form>
+<?php
+                }
+?>
                             </td>
                         </tr>
 <?php
@@ -131,7 +195,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 <?php
         }
         else {
-            echo '<b>沒有學生需要評論。</b>';
+            echo '<b>沒有評論資料。</b>';
         }
     }
 }
