@@ -77,6 +77,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                             <th scope="col">學生</th>
                             <th scope="col">論文名稱</th>
                             <th scope="col">評論教授</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -165,7 +166,8 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         <tr>
                             <td><?php echo $single_data['stu']; ?></td>
                             <td style="min-width: 150px;"><?php echo $single_data['project']; ?></td>
-                            <td class="px-2 py-0 d-flex flex-wrap">
+                            <td class="p-2">
+                                <div class="d-flex flex-wrap">
 <?php
                 $prof_array = explode(',', $single_data['prof']);
                 foreach ($prof_array as $single_prof) {
@@ -178,13 +180,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     $btn_title = ($comment_status == 1) ? '查看評論': '尚未評論';
                     $btn_disabled = ($comment_status == 1) ? '': 'disabled';
 ?>
-                                <form action="query.php" class="p-2">
-                                    <input type="hidden" name="comments_id" value="<?php echo $comment_id; ?>">
-                                    <input class="btn btn-sm <?php echo $btn_css; ?>" title="<?php echo $btn_title; ?>" <?php echo $btn_disabled; ?> type="submit" value="<?php echo $professor_name; ?>">
-                                </form>
+                                    <form action="query.php" class="p-1">
+                                        <input type="hidden" name="comments_id" value="<?php echo $comment_id; ?>">
+                                        <input class="btn btn-sm <?php echo $btn_css; ?>" title="<?php echo $btn_title; ?>" <?php echo $btn_disabled; ?> type="submit" value="<?php echo $professor_name; ?>">
+                                    </form>
 <?php
                 }
 ?>
+                                </div>
                             </td>
                         </tr>
 <?php
