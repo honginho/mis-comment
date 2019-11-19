@@ -169,11 +169,15 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                             <td class="p-2">
                                 <div class="d-flex flex-wrap">
 <?php
-                $prof_array = explode(',', $single_data['prof']);
-                foreach ($prof_array as $single_prof) {
+                $comment_ids_of_single_stu = "";
+                $prof_lists = explode(',', $single_data['prof']);
+                foreach ($prof_lists as $single_prof) {
                     $professor_name = explode('-', $single_prof)[0];
                     $comment_id = explode('-', $single_prof)[1];
                     $comment_status = explode('-', $single_prof)[2];
+
+                    // collect every comments' id of single student for better use
+                    $comment_ids_of_single_stu .= ($comment_ids_of_single_stu == "") ? $comment_id : ",$comment_id";
 
                     // ($comment_status == 1): already commented
                     $btn_css = ($comment_status == 1) ? 'btn-danger': 'btn-outline-secondary';
@@ -188,6 +192,41 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 }
 ?>
                                 </div>
+                            </td>
+                            <script>
+                                function proposalRevoke(commentIds) {
+                                    Swal.fire({
+                                        title: '確定要撤銷這位學生的提案嗎？',
+                                        text: "請注意，確定撤銷後將無法還原！",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: '確定',
+                                        cancelButtonText: '取消',
+                                    }).then(function (result) {
+                                        if (result.value) {
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: 'proposalRevoke.php',
+                                                data: { comment_ids_of_single_stu: commentIds },
+                                                success: function (data) {
+                                                    if (data == 'success')
+                                                        Swal.fire('撤銷成功', '', 'success').then(function () { location.reload(); });
+                                                    else
+                                                        Swal.fire('撤銷失敗', '系統出錯，請聯絡系統管理員。', 'error').then(function () { console.log(data); });
+                                                },
+                                                error: function () {
+                                                    Swal.fire('撤銷失敗', '系統出錯，請聯絡系統管理員。', 'error');
+                                                }
+                                            });
+                                        }
+                                    });
+                                    return false;
+                                }
+                            </script>
+                            <td class="p-2">
+                                <form class="p-1" onsubmit="return proposalRevoke('<?php echo $comment_ids_of_single_stu; ?>');">
+                                    <input class="btn btn-sm btn-warning" type="submit" value="撤銷">
+                                </form>
                             </td>
                         </tr>
 <?php
