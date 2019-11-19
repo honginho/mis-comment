@@ -4,23 +4,17 @@ require_once('connect.php');
 require_once('header.php');
 
 if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
-    if (isset($_SESSION['level']) && $_SESSION['level'] != 0) {
-        echo '你不是管理員。';
-        header("refresh: 0.5; url=./index.php", true, 301);
-        exit();
-    }
-    else {
-        if (isset($_GET['comments_id'])) {
-            $id = htmlspecialchars($_GET['comments_id']);
+    if (isset($_GET['comments_id'])) {
+        $id = htmlspecialchars($_GET['comments_id']);
 
-            // 確認是不是這位教授可以去評論的學生
-            $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `id` = ? && `prof_id` = ? AND (`status` = 0 OR `status` = 1)');
-            $stmt->bind_param('ii', $id, $_SESSION['prof_id']);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $stmt->close();
-            $rows = mysqli_num_rows($result);
-            if ($rows == 1 || $_SESSION['level'] == 0) {
+        // 確認是不是這位教授可以去評論的學生
+        $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `id` = ? && `prof_id` = ? AND (`status` = 0 OR `status` = 1)');
+        $stmt->bind_param('ii', $id, $_SESSION['prof_id']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+        $rows = mysqli_num_rows($result);
+        if ($rows == 1 || $_SESSION['level'] == 0) {
 ?>
     <script>
         function cancelComment() {
@@ -195,53 +189,53 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 </form>
             </div>
 <?php
-                // 抓資料，如果有紀錄的話
-                $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `id` = ?');
-                $stmt->bind_param('i', $id);
-                $stmt->execute();
-                $result_data_comments = $stmt->get_result();
-                $stmt->close();
-                $rows_data_comments = mysqli_num_rows($result_data_comments);
-                $comments_details['other_comment'] = '';
-                if ($rows_data_comments == 1) {
-                    $comments_details = mysqli_fetch_assoc($result_data_comments);
-                }
+            // 抓資料，如果有紀錄的話
+            $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `id` = ?');
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $result_data_comments = $stmt->get_result();
+            $stmt->close();
+            $rows_data_comments = mysqli_num_rows($result_data_comments);
+            $comments_details['other_comment'] = '';
+            if ($rows_data_comments == 1) {
+                $comments_details = mysqli_fetch_assoc($result_data_comments);
+            }
 
-                // 產生範例評論
-                $stmt = $conn->prepare('SELECT * FROM `comments_codes`');
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $stmt->close();
-                $rows = mysqli_num_rows($result);
-                if ($rows > 0) {
-                    $arr_comments_all = array();
-                    $arr_comments_category = array();
-                    for ($i = 0; $i < $rows; $i++) {
-                        $comments_eg = mysqli_fetch_assoc($result);
+            // 產生範例評論
+            $stmt = $conn->prepare('SELECT * FROM `comments_codes`');
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $stmt->close();
+            $rows = mysqli_num_rows($result);
+            if ($rows > 0) {
+                $arr_comments_all = array();
+                $arr_comments_category = array();
+                for ($i = 0; $i < $rows; $i++) {
+                    $comments_eg = mysqli_fetch_assoc($result);
 
-                        // 把`類別陣列`丟到`總陣列`
-                        if ($i != 0 && $comments_eg['sub'] == 0) {
-                            array_push($arr_comments_all, $arr_comments_category);
+                    // 把`類別陣列`丟到`總陣列`
+                    if ($i != 0 && $comments_eg['sub'] == 0) {
+                        array_push($arr_comments_all, $arr_comments_category);
 
-                            // 因為陣列是全域變數，所以要清空並重設
-                            unset($arr_comments_category);
-                            $arr_comments_category = array();
-                        }
-
-                        // 把各類別細項丟到`細項陣列`
-                        $arr_comment_details = array($comments_eg['main'], $comments_eg['sub'], $comments_eg['name']);
-
-                        // 把`細項陣列`丟到`類別陣列`
-                        array_push($arr_comments_category, $arr_comment_details);
+                        // 因為陣列是全域變數，所以要清空並重設
+                        unset($arr_comments_category);
+                        $arr_comments_category = array();
                     }
 
-                    // 把最後的那個`類別陣列`丟到`總陣列`
-                    array_push($arr_comments_all, $arr_comments_category);
+                    // 把各類別細項丟到`細項陣列`
+                    $arr_comment_details = array($comments_eg['main'], $comments_eg['sub'], $comments_eg['name']);
+
+                    // 把`細項陣列`丟到`類別陣列`
+                    array_push($arr_comments_category, $arr_comment_details);
                 }
-                else {
-                    echo '找不到評論範例。';
-                    die();
-                }
+
+                // 把最後的那個`類別陣列`丟到`總陣列`
+                array_push($arr_comments_all, $arr_comments_category);
+            }
+            else {
+                echo '找不到評論範例。';
+                die();
+            }
 ?>
             <div class="card-body">
 <?php if ($_SESSION['level'] == 1): ?>
@@ -252,16 +246,16 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
 <?php
-                for ($i = 0; $i < count($arr_comments_all); $i++) {
-                    $m = $arr_comments_all[$i][0][0]; // `main`
-                    $s = $arr_comments_all[$i][0][1]; // `sub`
-                    $n = $arr_comments_all[$i][0][2]; // `name`
-                    $active = ($m == 0) ? 'active' : '';
-                    $aria_selected = ($m == 0) ? 'true' : 'false';
+            for ($i = 0; $i < count($arr_comments_all); $i++) {
+                $m = $arr_comments_all[$i][0][0]; // `main`
+                $s = $arr_comments_all[$i][0][1]; // `sub`
+                $n = $arr_comments_all[$i][0][2]; // `name`
+                $active = ($m == 0) ? 'active' : '';
+                $aria_selected = ($m == 0) ? 'true' : 'false';
 ?>
                         <a class="nav-item nav-link <?php echo $active; ?>" id="nav-<?php echo $m; ?>-tab" data-toggle="tab" href="#nav-<?php echo $m; ?>" role="tab" aria-controls="分頁：<?php echo $n; ?>" aria-selected="<?php echo $aria_selected; ?>"><?php echo $n; ?></a>
 <?php
-                }
+            }
 ?>
                     </div>
                 </nav>
@@ -271,21 +265,21 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 <div class="tab-content mt-3" id="nav-tabContent" style="pointer-events: none;">
 <?php endif;
 
-                for ($i = 0; $i < count($arr_comments_all); $i++) {
-                    $active = ($i == 0) ? 'active' : '';
+            for ($i = 0; $i < count($arr_comments_all); $i++) {
+                $active = ($i == 0) ? 'active' : '';
 ?>
                     <div class="tab-pane fade show <?php echo $active; ?>" id="nav-<?php echo $i; ?>" role="tabpanel" aria-labelledby="分頁：<?php echo $arr_comments_all[$i][0][2]; ?>">
 <?php
-                    for ($j = 1; $j < count($arr_comments_all[$i]); $j++) {
-                        $f = $arr_comments_all[$i][$j][0] . '-' . $arr_comments_all[$i][$j][1];
-                        $n = $arr_comments_all[$i][$j][2];
+                for ($j = 1; $j < count($arr_comments_all[$i]); $j++) {
+                    $f = $arr_comments_all[$i][$j][0] . '-' . $arr_comments_all[$i][$j][1];
+                    $n = $arr_comments_all[$i][$j][2];
 ?>
                         <div class="comments-eg">
                             <input type="checkbox" id="comments-<?php echo $f; ?>" name="comments_codes[]" style="display: none;">
                             <label class="btn btn-comments-eg text-left" for="comments-<?php echo $f; ?>"><?php echo $n; ?></label>
                         </div>
 <?php
-                    }
+                }
 ?>
                         <hr>
                         <div class="form-group">
@@ -293,7 +287,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         </div>
                     </div>
 <?php
-                }
+            }
 ?>
                 </div>
             </div>
@@ -311,7 +305,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
         </div>
     </div>
 <?php
-                if ($rows_data_comments == 1) {
+            if ($rows_data_comments == 1) {
 ?>
             <script>
                 let comments = '<?php echo $comments_details['comment']; ?>'.split(',');
@@ -327,19 +321,18 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 }
             </script>
 <?php
-                }
-            }
-            else {
-                echo '這不是教授可以評論的學生喔。';
-                header("refresh: 0; url=./index.php", true, 301);
-                exit();
             }
         }
         else {
-            echo '請選擇評論學生。';
+            echo '這不是教授可以評論的學生喔。';
             header("refresh: 0; url=./index.php", true, 301);
             exit();
         }
+    }
+    else {
+        echo '請選擇評論學生。';
+        header("refresh: 0; url=./index.php", true, 301);
+        exit();
     }
 }
 else {
