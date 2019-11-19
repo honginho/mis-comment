@@ -164,8 +164,8 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 ?>
                         <tr>
                             <td><?php echo $single_data['stu']; ?></td>
-                            <td><?php echo $single_data['project']; ?></td>
-                            <td style="padding: 0.5rem; display: flex;">
+                            <td style="min-width: 150px;"><?php echo $single_data['project']; ?></td>
+                            <td class="px-2 py-0 d-flex flex-wrap">
 <?php
                 $prof_array = explode(',', $single_data['prof']);
                 foreach ($prof_array as $single_prof) {
@@ -174,11 +174,11 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     $comment_status = explode('-', $single_prof)[2];
 
                     // ($comment_status == 1): already commented
-                    $btn_css = ($comment_status == 1) ? 'btn-success': 'btn-outline-secondary';
+                    $btn_css = ($comment_status == 1) ? 'btn-danger': 'btn-outline-secondary';
                     $btn_title = ($comment_status == 1) ? '查看評論': '尚未評論';
                     $btn_disabled = ($comment_status == 1) ? '': 'disabled';
 ?>
-                                <form action="query.php" style="padding: 0 0.5rem;">
+                                <form action="query.php" class="p-2">
                                     <input type="hidden" name="comments_id" value="<?php echo $comment_id; ?>">
                                     <input class="btn btn-sm <?php echo $btn_css; ?>" title="<?php echo $btn_title; ?>" <?php echo $btn_disabled; ?> type="submit" value="<?php echo $professor_name; ?>">
                                 </form>
