@@ -10,10 +10,7 @@ session_start();
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <title>國立中正大學資管所&醫管所論文提案書評論系統</title>
-    <link rel="stylesheet" href="bootstrap.min.css">
-    <script src="jquery-3.4.1.js"></script>
-    <script src="popper.min.js"></script>
-    <script src="bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <style>
         #form-check-comments > .form-row > .form-group {
             padding: 1rem 1rem .5rem;
