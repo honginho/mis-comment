@@ -13,8 +13,6 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
         if (isset($_POST['comments_id']) && trim($_POST['comments_id']) != '') {
             $id = htmlspecialchars($_POST['comments_id']);
 
-            date_default_timezone_set("Asia/Taipei");
-
             if ((isset($_POST['other_comment']) && !empty($_POST['other_comment'])) || (isset($_POST['comments_codes']) && !empty($_POST['comments_codes']))) {
                 // 確認是不是這位教授可以去評論的學生
                 $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `id` = ? && `prof_id` = ? AND (`status` = 0 OR `status` = 1)');
