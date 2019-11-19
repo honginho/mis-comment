@@ -7,8 +7,6 @@ if (isset($_POST['comments_id']) && trim($_POST['comments_id']) != '') {
     $id = htmlspecialchars($_POST['comments_id']);
 
     date_default_timezone_set("Asia/Taipei");
-    $now = new DateTime();
-    $datetime = $now->format("Y-m-d H:i:s");
 
     if ((isset($_POST['other_comment']) && !empty($_POST['other_comment'])) || (isset($_POST['comments_codes']) && !empty($_POST['comments_codes']))) {
         // 確認是不是這位教授可以去評論的學生
@@ -32,8 +30,8 @@ if (isset($_POST['comments_id']) && trim($_POST['comments_id']) != '') {
                         $result_other_comment .= $split_symbol . $otehr_comment_index . '@-|-@' . $other_comment;
                     }
 
-                    $stmt = $conn->prepare('UPDATE `comments` SET `other_comment` = ?, `status` = 1, `update_at` = ? WHERE `id` = ?');
-                    $stmt->bind_param('ssi', $result_other_comment, $datetime, $id);
+                    $stmt = $conn->prepare('UPDATE `comments` SET `other_comment` = ?, `status` = 1 WHERE `id` = ?');
+                    $stmt->bind_param('si', $result_other_comment, $id);
                     $stmt->execute();
                     $stmt->close();
                 }
@@ -52,8 +50,8 @@ if (isset($_POST['comments_id']) && trim($_POST['comments_id']) != '') {
                     $conclusion .= ',' . htmlspecialchars($comments[$i]);
                 }
 
-                $stmt = $conn->prepare('UPDATE `comments` SET `comment` = ?, `status` = 1, `update_at` = ? WHERE `id` = ?');
-                $stmt->bind_param('ssi', $conclusion, $datetime, $id);
+                $stmt = $conn->prepare('UPDATE `comments` SET `comment` = ?, `status` = 1 WHERE `id` = ?');
+                $stmt->bind_param('si', $conclusion, $id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -80,8 +78,8 @@ if (isset($_POST['comments_id']) && trim($_POST['comments_id']) != '') {
             $comments_details = mysqli_fetch_assoc($result);
 
             if ($comments_details['status'] == 1) {
-                $stmt = $conn->prepare('UPDATE `comments` SET `comment` = "", `other_comment` = "", `update_at` = ? WHERE `id` = ?');
-                $stmt->bind_param('si', $datetime, $id);
+                $stmt = $conn->prepare('UPDATE `comments` SET `comment` = "", `other_comment` = "" WHERE `id` = ?');
+                $stmt->bind_param('i', $id);
                 $stmt->execute();
                 $stmt->close();
 
