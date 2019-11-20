@@ -48,21 +48,38 @@
         $STU_ID = $sheet->getCell('C'.$row)->getValue();
         $DEPT = $sheet->getCell('D'.$row)->getValue();
         $PROJECT = $sheet->getCell('E'.$row)->getValue();
+        $PROF = $sheet->getCell('F'.$row)->getValue(); //評論老師
 
         // TODO: prepare statement
 
         //新增新同學資料
         $add = "INSERT INTO `stu` (name, stu_id, dept, project)
                 SELECT * FROM (SELECT '$NAME' , '$STU_ID', '$DEPT', '$PROJECT') AS tmp
-                WHERE NOT EXISTS ( SELECT * FROM `stu` WHERE stu_id = '$STU_ID' and project = '$PROJECT') LIMIT 1";
+                WHERE NOT EXISTS ( SELECT * FROM `stu` WHERE stu_id = '$STU_ID' and project = '$PROJECT') LIMIT 1"; //過濾掉ID論文名稱相同資料
                 //https://stackoverflow.com/questions/3164505/mysql-insert-record-if-not-exists-in-table
-
+        mysqli_query($conn,$add);
         // TODO: 印出有重複的給管理員看
         
-        //新增評論資料
-        // $addcomment = "SELECT `id` FROM prof 
-
-        mysqli_query($conn,$add);
+        //新增評論資料 1.對比教授們的ID 2.對比學生ID
+        
+        $get_stu_id = mysqli_query($conn,"SELECT `id`,`stu_id` FROM `stu` WHERE `stu_id` = '$STU_ID'");
+        $row_stu_id;
+        while ($row3=mysqli_fetch_row($get_stu_id))
+        {
+            $row_stu_id = $row3[0];
+            echo "學生ID:".$row3[0]."<br>";
+            echo "學生學號:".$row3[1]."<br>";
+            $get_prof= explode(",", $PROF); //分割評論老師 回傳陣列
+            for($i=0;$i< count($get_prof);$i++){
+                $get_prof_id = mysqli_query($conn,"SELECT `id`,`name` FROM `prof` WHERE `name` = '$get_prof[$i]'");
+                while ($row2=mysqli_fetch_row($get_prof_id)){
+                    echo "評論老師的ID:".$row2[0]."<br>"; //[0]:與會老師的ID
+                    $addcomment = "INSERT INTO `comments` (semester,prof_id,stu_id) VALUES (10806,$row2[0],$row_stu_id)";
+                    echo $addcomment."<br>";
+                    mysqli_query($conn,$addcomment);
+                }
+            }
+        }
     }
     ?>
 </body>
