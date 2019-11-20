@@ -4,7 +4,7 @@ require_once('header.php');
 
 if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     if (isset($_SESSION['level']) && $_SESSION['level'] == 0) { //管理員
-        header("refresh: 0; url=./list.php", true, 301); //跳轉頁面，會多停頓在此php頁面
+        header("refresh: 0; url=./admin.php", true, 301); //跳轉頁面，會多停頓在此php頁面
         exit();
     }
     else {

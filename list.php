@@ -1,8 +1,4 @@
 <?php
-// session_start();
-require_once('connect.php');
-require_once('header.php');
-
 if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     if (isset($_SESSION['level']) && $_SESSION['level'] != 0) {
         echo '你不是管理員。';
@@ -10,22 +6,10 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
         exit();
     }
     else {
-        $prof_id = $_SESSION['prof_id'];
 ?>
-
-    <div class="container">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <b>國立中正大學資管所&醫管所論文提案書評論系統</b>
-                <form action="logout.php" method="POST">
-                    <input type="button" class="btn btn-sm btn-light" value="<?php echo $_SESSION['account']; ?>" disabled>
-                    <input type="submit" class="btn btn-sm btn-danger" value="登出">
-                </form>
-            </div>
-            <div class="card-body table-responsive">
                 <form class="form-inline mb-3" action="list.php" method="GET">
                     <div class="form-group mr-1 mr-sm-3">
-                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字" required autofocus>
+                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字">
                     </div>
                     <div class="form-group" style="display:inline;">
                         <input class="btn btn-success" type="submit" value="查詢學生">
@@ -52,9 +36,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     $split = ($i == 0) ? '' : ' OR ';
                     $condition .= $split . '`stu_id` = ' . $data_stu['id'];
                 }
-               // echo $condition;
                 $stmt = $conn->prepare('SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND (' . $condition . ')');
-                echo 'SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND (' . $condition . ')';
                 $stmt->execute();
             }
             else {
@@ -242,9 +224,6 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     }
 }
 else {
-    header("refresh: 0; url=./login.php", true, 301);
+    header("refresh: 0; url=./index.php", true, 301);
     exit();
 }
-
-require_once('footer.php');
-

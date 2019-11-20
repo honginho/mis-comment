@@ -40,6 +40,10 @@ session_start();
             color: #fff;
             font-weight: bold;
         }
+
+        .nav-item.nav-link {
+            outline: none;
+        }
     </style>
 </head>
 <body class="py-5" style="background-color: #fefefe; font-family: 'Microsoft JhengHei';">
