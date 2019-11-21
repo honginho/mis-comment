@@ -25,16 +25,20 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             <div class="card-body table-responsive">
                 <nav>
                     <div class="nav nav-tabs" role="tablist">
-                        <a class="nav-item nav-link active" style="outline: none;" id="nav-list-tab" data-toggle="tab" href="#nav-list" role="tab" aria-controls="nav-list" aria-selected="true">所有資料</a>
-                        <a class="nav-item nav-link" style="outline: none;" id="nav-upload-tab" data-toggle="tab" href="#nav-upload" role="tab" aria-controls="nav-upload" aria-selected="false">上傳提案</a>
+                        <a class="nav-item nav-link active" id="nav-list-tab" data-toggle="tab" href="#nav-list" role="tab" aria-controls="nav-list" aria-selected="true">所有資料</a>
+                        <a class="nav-item nav-link" id="nav-semester-tab" data-toggle="tab" href="#nav-semester" role="tab" aria-controls="nav-semester" aria-selected="false">場次列表</a>
+                        <a class="nav-item nav-link" id="nav-upload-tab" data-toggle="tab" href="#nav-upload" role="tab" aria-controls="nav-upload" aria-selected="false">上傳提案</a>
                     </div>
                 </nav>
                 <div class="tab-content mt-3">
                     <div class="tab-pane fade show active" id="nav-list" role="tabpanel" aria-labelledby="nav-list-tab">
                         <?php include_once('list.php'); ?>
                     </div>
+                    <div class="tab-pane fade" id="nav-semester" role="tabpanel" aria-labelledby="nav-semester-tab">
+                        <?php include_once('semester.php'); ?>
+                    </div>
                     <div class="tab-pane fade" id="nav-upload" role="tabpanel" aria-labelledby="nav-upload-tab">
-                        <?php include_once('upload.php'); ?>
+                        upload
                     </div>
                 </div>
             </div>
