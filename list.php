@@ -37,40 +37,82 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         return false;
                     }
                 </script>
-                <form class="form-inline mb-3" action="list.php" method="GET">
+                <form class="form-inline mb-3" action="admin.php" method="GET">
                     <div class="form-group mr-1 mr-sm-3">
-                        <input type="text" class="form-control" name="condition_stu" placeholder="請輸入關鍵字">
+                        <input type="text" class="form-control" name="condition_all" placeholder="請輸入關鍵字">
                     </div>
                     <div class="form-group" style="display:inline;">
-                        <input class="btn btn-success" type="submit" value="查詢學生">
-<?php if (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != ''): ?>
-                        <input type="button" class="btn btn-light" value="查詢結果：<?php echo $_GET['condition_stu']; ?>" disabled>
+                        <input class="btn btn-success" type="submit" value="查詢學生或教授">
+<?php if (isset($_GET['condition_all']) && trim($_GET['condition_all']) != ''): ?>
+                        <input type="button" class="btn btn-light" value="關鍵字：<?php echo $_GET['condition_all']; ?>" disabled>
 <?php endif; ?>
                     </div>
                 </form>
 <?php
-        if (isset($_GET['condition_stu']) && trim($_GET['condition_stu']) != '') {
-            $stu = htmlspecialchars($_GET['condition_stu']);
+        if (isset($_GET['condition_all']) && trim($_GET['condition_all']) != '') { //若搜尋框內有接收到東西
+            $all = htmlspecialchars($_GET['condition_all']); //將搜尋關鍵字化成單純可讀
 
-            $stmt = $conn->prepare('SELECT `id`, `name` FROM `stu` WHERE `name` LIKE CONCAT("%", ?, "%")');
-            // 會出錯：$stmt->bind_param('s', '%'.$stu.'%');
-            $stmt->bind_param('s', $stu);
+            // $stmt = $conn->prepare('SELECT `id`, `name` FROM `stu` WHERE `name` LIKE CONCAT("%", ?, "%")');
+            // // 會出錯：$stmt->bind_param('s', '%'.$stu.'%');
+            // $stmt->bind_param('s', $stu);
+            // $stmt->execute();
+            // $result_stu = $stmt->get_result();
+            // $stmt->close();
+            // $rows_stu = mysqli_num_rows($result_stu);
+            // if ($rows_stu > 0) {
+            //     $condition = '';
+            //     for ($i = 0; $i < $rows_stu; $i++) {
+            //         $data_stu = mysqli_fetch_assoc($result_stu);
+            //         $split = ($i == 0) ? '' : ' OR ';
+            //         $condition .= $split . '`stu_id` = ' . $data_stu['id'];
+            //     }
+            //     $stmt = $conn->prepare('SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND (' . $condition . ')');
+            //     $stmt->execute();
+            // }
+            // else {
+            //     echo '<b>沒有學生。</b>';
+            //     die();
+            // }
+
+            $stmt = $conn->prepare('SELECT `id`, `name` FROM `stu` WHERE `name` LIKE CONCAT("%", ?, "%")'); //模糊查詢
+            $stmt->bind_param('s', $all);
             $stmt->execute();
             $result_stu = $stmt->get_result();
             $stmt->close();
-            $rows_stu = mysqli_num_rows($result_stu);
-            if ($rows_stu > 0) {
-                $condition = '';
-                for ($i = 0; $i < $rows_stu; $i++) {
-                    $data_stu = mysqli_fetch_assoc($result_stu);
-                    $split = ($i == 0) ? '' : ' OR ';
-                    $condition .= $split . '`stu_id` = ' . $data_stu['id'];
+            // var_dump($result_stu);
+            // echo '<br>';
+
+            $stmt = $conn->prepare('SELECT `id`, `name` FROM `prof` WHERE `name` LIKE CONCAT("%", ?, "%")');
+            $stmt->bind_param('s', $all);
+            $stmt->execute();
+            $result_prof = $stmt->get_result();
+            $stmt->close();
+            // var_dump($result_prof);
+            // $stmt->close();
+
+            $rows_prof = mysqli_num_rows($result_prof);
+            $rows_stu =  mysqli_num_rows($result_stu);
+            if ($rows_prof + $rows_stu > 0){
+                $condition = "";
+                if ($rows_prof > 0){
+                    for ($i = 0; $i < $rows_prof; $i++){
+                        $data_prof = mysqli_fetch_assoc($result_prof);
+                        $split = ($i == 0) ? '' : ' OR ';
+                        $condition .= $split . '`prof_id` = ' . $data_prof['id'];
+                    }
+                }
+                if ($rows_stu > 0){
+                    for ($i = 0; $i < $rows_stu; $i++){
+                        $data_stu = mysqli_fetch_assoc($result_stu);
+                        $split = ($i == 0 && $rows_prof == 0) ? '' : ' OR ';
+                        $condition .= $split . '`stu_id` = ' . $data_stu['id'];
+                    }
                 }
                 $stmt = $conn->prepare('SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND (' . $condition . ')');
                 $stmt->execute();
             }
             else {
-                echo '<b>沒有學生。</b>';
+                echo '<b>查無結果。</b>';
                 die();
             }
         }
@@ -78,6 +120,9 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `status` = 0 OR `status` = 1');
             $stmt->execute();
         }
+
+        // TODO: Debug 會出現資料顯示不完整的問題 => 學生、論文名稱、教授(沒有全列)
+
         $result = $stmt->get_result();
         $stmt->close();
         $rows = mysqli_num_rows($result);
