@@ -131,6 +131,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 <table class="table table-striped">
                     <thead>
                         <tr>
+                            <th scope="col">場次</th>
                             <th scope="col">學生</th>
                             <th scope="col">論文名稱</th>
                             <th scope="col">評論教授</th>
@@ -144,6 +145,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             for ($i = 0; $i < $rows; $i++) {
                 $comments = mysqli_fetch_assoc($result);
                 $id = $comments['id'];
+                $semester = $comments['semester'];
                 $prof_id = $comments['prof_id'];
                 $stu_id = $comments['stu_id'];
                 $status = $comments['status'];
@@ -221,6 +223,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             foreach ($comments_formatted_data as $single_data) {
 ?>
                         <tr>
+                            <td><?php echo $semester; ?></td>
                             <td><?php echo $single_data['stu']; ?></td>
                             <td style="min-width: 150px;"><?php echo $single_data['project']; ?></td>
                             <td class="p-2">
