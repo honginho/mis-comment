@@ -12,6 +12,35 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     else {
         $prof_id = $_SESSION['prof_id'];
 ?>
+    <script>
+        function getFileName() {
+            let filePath = $('#file').val(); // get the file name
+            let fileName = filePath.split('\\'); // get the file name
+            $('#file').next('.custom-file-label').html(fileName[fileName.length-1]); // replace the "Choose a file" label
+        }
+
+        function uploadFile() {
+            $.ajax({
+                type: 'POST',
+                url: 'upload.php',
+                cache: false,
+                data: new FormData($('#uploadForm')[0]),
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data == 'success')
+                        Swal.fire('上傳成功', '', 'success').then(function () { location.reload(); });
+                    else
+                        Swal.fire('上傳失敗', '系統出錯，請聯絡系統管理員。', 'error').then(function () { console.log(data); });
+                },
+                error: function () {
+                    Swal.fire('上傳失敗', '系統出錯，請聯絡系統管理員。', 'error');
+                }
+            });
+
+            return false;
+        }
+    </script>
 
     <div class="container">
         <div class="card">
@@ -31,6 +60,11 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     </div>
                 </nav>
                 <div class="tab-content mt-3">
+                    <style>
+                        .custom-file-label::after {
+                            content: '瀏覽';
+                        }
+                    </style>
                     <div class="tab-pane fade show active" id="nav-list" role="tabpanel" aria-labelledby="nav-list-tab">
                         <?php include_once('list.php'); ?>
                     </div>
@@ -38,7 +72,36 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         <?php include_once('semester.php'); ?>
                     </div>
                     <div class="tab-pane fade" id="nav-upload" role="tabpanel" aria-labelledby="nav-upload-tab">
-                        upload
+                        <form id="uploadForm" class="d-flex" enctype="multipart/form-data" onsubmit="return uploadFile();">
+                            <select name="targetSemester" class="custom-select" style="max-width: 110px; min-width: 110px;" required>
+                                <option value="">選擇學期</option>
+<?php
+        $stmt = $conn->prepare('SELECT * FROM `semester` WHERE `status` = 1');
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+        $rows = mysqli_num_rows($result);
+        if ($rows > 0) {
+            for ($i = 0; $i < $rows; $i++) {
+                $semester = mysqli_fetch_assoc($result);
+                $id = $semester['id'];
+                $name = $semester['name'];
+                echo '<option value="' . $name . '">' . $name . '</option>';
+            }
+        }
+        else {
+            echo '<option value="">無</option>';
+        }
+?>
+                            </select>
+
+                            <div class="custom-file mx-4">
+                                <input type="file" class="custom-file-input" name="file" id="file" accept=".xlsx" required onchange="getFileName()">
+                                <label class="custom-file-label" for="file">選擇檔案</label>
+                            </div>
+
+                            <input class="btn btn-success" type="submit" name="submit" value="檔案上傳"/>
+                        </form>
                     </div>
                 </div>
             </div>
