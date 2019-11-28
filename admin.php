@@ -55,7 +55,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 <nav>
                     <div class="nav nav-tabs" role="tablist">
                         <a class="nav-item nav-link active" id="nav-list-tab" data-toggle="tab" href="#nav-list" role="tab" aria-controls="nav-list" aria-selected="true">所有資料</a>
-                        <a class="nav-item nav-link" id="nav-semester-tab" data-toggle="tab" href="#nav-semester" role="tab" aria-controls="nav-semester" aria-selected="false">場次列表</a>
+                        <a class="nav-item nav-link" id="nav-semester-tab" data-toggle="tab" href="#nav-semester" role="tab" aria-controls="nav-semester" aria-selected="false">梯次列表</a>
                         <a class="nav-item nav-link" id="nav-upload-tab" data-toggle="tab" href="#nav-upload" role="tab" aria-controls="nav-upload" aria-selected="false">上傳提案</a>
                         <a class="nav-item nav-link" id="nav-user-tab" data-toggle="tab" href="#nav-user" role="tab" aria-controls="nav-user" aria-selected="false">管理用戶</a>
                     </div>

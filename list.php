@@ -131,7 +131,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">場次</th>
+                            <th scope="col">梯次</th>
                             <th scope="col">學生</th>
                             <th scope="col">論文名稱</th>
                             <th scope="col">評論教授</th>
@@ -294,7 +294,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                                     <input class="btn btn-sm btn-warning" type="submit" value="撤銷">
                                 </form>
 <?php else: ?>
-                                <b>(場次已關閉)</b>
+                                <b>(梯次已關閉)</b>
 <?php endif; ?>
                             </td>
                         </tr>

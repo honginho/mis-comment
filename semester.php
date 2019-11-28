@@ -16,14 +16,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                                 settings.explain = '新增';
 
                                 if (settings.details.length > 10) {
-                                    Swal.fire(`${settings.explain}失敗`, '場次名稱過長(限10個數字以內)，請重新輸入。', 'error')
+                                    Swal.fire(`${settings.explain}失敗`, '梯次名稱過長(限10個數字以內)，請重新輸入。', 'error')
                                         .then(function () {
                                             $('form input[name="semesterName"]').val('');
                                             setTimeout(function () { $('form input[name="semesterName"]').focus(); }, 500);
                                         });
                                 }
                                 else if (settings.details == '') {
-                                    Swal.fire(`${settings.explain}失敗`, '請輸入場次名稱。', 'error')
+                                    Swal.fire(`${settings.explain}失敗`, '請輸入梯次名稱。', 'error')
                                         .then(function () {
                                             $('form input[name="semesterName"]').val('');
                                             setTimeout(function () { $('form input[name="semesterName"]').focus(); }, 500);
@@ -38,11 +38,11 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                                             if (data == 'success')
                                                 Swal.fire(`${settings.explain}成功`, '', 'success').then(function () { location.reload(); });
                                             else if (data == 'duplicate')
-                                                Swal.fire(`${settings.explain}失敗`, '場次名稱重複，請更換。', 'error').then(function () { console.log(data); });
+                                                Swal.fire(`${settings.explain}失敗`, '梯次名稱重複，請更換。', 'error').then(function () { console.log(data); });
                                             else if (data == 'tolong')
-                                                Swal.fire(`${settings.explain}失敗`, '場次名稱過長(限10個數字以內)，請重新輸入。', 'error').then(function () { console.log(data); });
+                                                Swal.fire(`${settings.explain}失敗`, '梯次名稱過長(限10個數字以內)，請重新輸入。', 'error').then(function () { console.log(data); });
                                             else if (data == 'null')
-                                                Swal.fire(`${settings.explain}失敗`, '請輸入場次名稱。', 'error').then(function () { console.log(data); });
+                                                Swal.fire(`${settings.explain}失敗`, '請輸入梯次名稱。', 'error').then(function () { console.log(data); });
                                             else
                                                 Swal.fire(`${settings.explain}失敗`, '系統出錯，請聯絡系統管理員。', 'error').then(function () { console.log(data); });
                                         },
@@ -57,7 +57,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                                 settings.explain = (action == 'revoke') ? '撤銷' : '復原';
 
                                 Swal.fire({
-                                    title: `確定要<u>${settings.explain}</u>這個場次嗎？`,
+                                    title: `確定要<u>${settings.explain}</u>這個梯次嗎？`,
                                     icon: 'warning',
                                     showCancelButton: true,
                                     confirmButtonText: '確定',
@@ -86,7 +86,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                                 settings.explain = '刪除';
 
                                 Swal.fire({
-                                    title: `確定要<u>${settings.explain}</u>這個場次嗎？`,
+                                    title: `確定要<u>${settings.explain}</u>這個梯次嗎？`,
                                     text: `請注意，確定${settings.explain}後將無法還原！`,
                                     icon: 'warning',
                                     showCancelButton: true,
@@ -120,14 +120,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         <input type="text" class="form-control" name="semesterName" placeholder="限10個數字以內" required>
                     </div>
                     <div class="form-group d-inline">
-                        <input class="btn btn-success" type="submit" value="新增場次">
+                        <input class="btn btn-success" type="submit" value="新增梯次">
                     </div>
                 </form>
 
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">場次</th>
+                            <th scope="col">梯次</th>
                             <th scope="col">狀態</th>
                             <th></th>
                         </tr>
