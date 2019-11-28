@@ -51,10 +51,10 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 $stmt->execute();
                 $stmt->close();
 
-                $stmt = $conn->prepare('UPDATE `comments` SET `status` = `status` - 2 WHERE `semester` = ?');
-                $stmt->bind_param('i', $semester_name);
-                $stmt->execute();
-                $stmt->close();
+                // $stmt = $conn->prepare('UPDATE `comments` SET `status` = `status` - 2 WHERE `semester` = ?');
+                // $stmt->bind_param('i', $semester_name);
+                // $stmt->execute();
+                // $stmt->close();
 
                 echo 'success';
             }
@@ -67,10 +67,10 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 $stmt->execute();
                 $stmt->close();
 
-                $stmt = $conn->prepare('UPDATE `comments` SET `status` = `status` + 2 WHERE `semester` = ?');
-                $stmt->bind_param('i', $semester_name);
-                $stmt->execute();
-                $stmt->close();
+                // $stmt = $conn->prepare('UPDATE `comments` SET `status` = `status` + 2 WHERE `semester` = ?');
+                // $stmt->bind_param('i', $semester_name);
+                // $stmt->execute();
+                // $stmt->close();
 
                 echo 'success';
             }

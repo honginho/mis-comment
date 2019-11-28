@@ -22,13 +22,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             </div>
             <div class="card-body table-responsive">
 <?php
-        $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `prof_id` = ? AND (`status` = 0 OR `status` = 1)');
-        $stmt->bind_param('i', $prof_id);
+        // select comments that their semesters are available
+        $stmt = $conn->prepare('SELECT * FROM `semester` WHERE `status` = 1');
         $stmt->execute();
-        $result = $stmt->get_result();
+        $result_semester = $stmt->get_result();
         $stmt->close();
-        $rows = mysqli_num_rows($result);
-        if ($rows > 0) {
+        $rows_semester = mysqli_num_rows($result_semester);
+        $semester_lists_available = array();
+        if ($rows_semester > 0) {
 ?>
                 <table class="table table-striped">
                     <thead>
@@ -41,8 +42,31 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     </thead>
                     <tbody>
 <?php
-            for ($i = 0; $i < $rows; $i++) {
-                $comments = mysqli_fetch_assoc($result);
+            for ($i = 0; $i < $rows_semester; $i++) {
+                $semester = mysqli_fetch_assoc($result_semester);
+                array_push($semester_lists_available, $semester['name']);
+            }
+        }
+        else {
+            die('<b>沒有學生需要評論。</b>');
+        }
+        $semester_condition = '';
+        for ($i = 0; $i < count($semester_lists_available); $i++) {
+            if ($i == 0) $semester_condition .= ' AND (';
+            $split = ($i == 0) ? '' : ' OR ';
+            $semester_condition .= $split . '`semester` = ' . $semester_lists_available[$i];
+            if ($i == count($semester_lists_available)-1) $semester_condition .= ')';
+        }
+
+        $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `prof_id` = ?' . $semester_condition);
+        $stmt->bind_param('i', $prof_id);
+        $stmt->execute();
+        $result_comments = $stmt->get_result();
+        $stmt->close();
+        $rows_comments = mysqli_num_rows($result_comments);
+        if ($rows_comments > 0) {
+            for ($i = 0; $i < $rows_comments; $i++) {
+                $comments = mysqli_fetch_assoc($result_comments);
                 $id = $comments['id'];
                 $prof_id = $comments['prof_id'];
                 $stu_id = $comments['stu_id'];

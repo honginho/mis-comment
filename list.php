@@ -108,7 +108,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         $condition .= $split . '`stu_id` = ' . $data_stu['id'];
                     }
                 }
-                $stmt = $conn->prepare('SELECT * FROM `comments` WHERE (`status` = 0 OR `status` = 1) AND (' . $condition . ')');
+                $stmt = $conn->prepare('SELECT * FROM `comments` WHERE  (' . $condition . ') ORDER BY `id` DESC');
                 $stmt->execute();
             }
             else {
@@ -117,7 +117,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             }
         }
         else {
-            $stmt = $conn->prepare('SELECT * FROM `comments` WHERE `status` = 0 OR `status` = 1');
+            $stmt = $conn->prepare('SELECT * FROM `comments` ORDER BY `id` DESC');
             $stmt->execute();
         }
 
@@ -171,28 +171,46 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     $stu = mysqli_fetch_assoc($result_data_stu);
 
                     /* format comments data for frontend render:
+                     *
                      *   array(
-                     *     array(
-                     *       stu => [student_name],
-                     *       prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
-                     *       project => [project_name]
+                     *     [semester] => array(
+                     *       array(
+                     *         stu => [student_name],
+                     *         prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
+                     *         project => [project_name]
+                     *       ),
+                     *       array(
+                     *         stu => [student_name],
+                     *         prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
+                     *         project => [project_name]
+                     *       ),
                      *     ),
-                     *     array(
-                     *       stu => [student_name],
-                     *       prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
-                     *       project => [project_name]
+                     *     [semester] => array(
+                     *       array(
+                     *         stu => [student_name],
+                     *         prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
+                     *         project => [project_name]
+                     *       ),
+                     *       array(
+                     *         stu => [student_name],
+                     *         prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
+                     *         project => [project_name]
+                     *       ),
                      *     ),
                      *     ......
                      *   )
                      */
                     $tmp = array();
-                    $length_formatted_data = count($comments_formatted_data);
-                    if ($length_formatted_data > 0) {
+                    if (!isset($comments_formatted_data[$semester]))
+                        $comments_formatted_data[$semester] = array();
+
+                    $length_formatted_data = count($comments_formatted_data[$semester]);
+                    if ($comments_formatted_data[$semester] > 0) {
                         $count = 0;
                         for ($j = 0; $j < $length_formatted_data; $j++) {
                             // need not push new formatted data while student name are duplicate
-                            if ($comments_formatted_data[$j]['stu'] == $stu['name']) {
-                                $comments_formatted_data[$j]['prof'] .= "," . $prof['name'] . "-$id-$status";
+                            if ($comments_formatted_data[$semester][$j]['stu'] == $stu['name']) {
+                                $comments_formatted_data[$semester][$j]['prof'] .= "," . $prof['name'] . "-$id-$status";
                                 break;
                             }
                             $count++;
@@ -200,17 +218,19 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 
                         // push new formatted data while student name aren't duplicate
                         if ($count == $length_formatted_data) {
+                            $tmp['semester'] = $semester;
                             $tmp['stu'] = $stu['name'];
                             $tmp['prof'] = $prof['name'] . "-$id-$status";
                             $tmp['project'] = $stu['project'];
-                            array_push($comments_formatted_data, $tmp);
+                            array_push($comments_formatted_data[$semester], $tmp);
                         }
                     }
                     else {
+                        $tmp['semester'] = $semester;
                         $tmp['stu'] = $stu['name'];
                         $tmp['prof'] = $prof['name'] . "-$id-$status";
                         $tmp['project'] = $stu['project'];
-                        array_push($comments_formatted_data, $tmp);
+                        array_push($comments_formatted_data[$semester], $tmp);
                     }
                 }
                 else {
@@ -219,47 +239,67 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 }
             }
 
+            // var_dump($semester_array); die();
+
             // render formatted data to frontend
-            foreach ($comments_formatted_data as $single_data) {
+            $semester_lists_array = array_keys($comments_formatted_data);
+            $length_semester_lists_array = count($semester_lists_array);
+            for ($i = 0; $i < $length_semester_lists_array; $i++) {
+                // semester: get `status` to determine if it is available
+                $stmt = $conn->prepare('SELECT * FROM `semester` WHERE `name` = ?');
+                $stmt->bind_param('i', $semester_lists_array[$i]);
+                $stmt->execute();
+                $result_semester = $stmt->get_result();
+                $stmt->close();
+                $rows_semester = mysqli_num_rows($result_semester);
+                $single_semester = mysqli_fetch_assoc($result_semester);
+                $semester_is_available = $single_semester['status'];
+                $semester_is_available_css = ($semester_is_available) ? 'opacity: 1' : 'opacity: .5';
+                foreach ($comments_formatted_data[$semester_lists_array[$i]] as $single_data) {
 ?>
-                        <tr>
-                            <td><?php echo $semester; ?></td>
+                        <tr style="<?php echo $semester_is_available_css; ?>">
+                            <td><?php echo $single_data['semester']; ?></td>
                             <td><?php echo $single_data['stu']; ?></td>
                             <td style="min-width: 150px;"><?php echo $single_data['project']; ?></td>
                             <td class="p-2">
                                 <div class="d-flex flex-wrap">
 <?php
-                $comment_ids_of_single_stu = "";
-                $prof_lists = explode(',', $single_data['prof']);
-                foreach ($prof_lists as $single_prof) {
-                    $professor_name = explode('-', $single_prof)[0];
-                    $comment_id = explode('-', $single_prof)[1];
-                    $comment_status = explode('-', $single_prof)[2];
+                    $comment_ids_of_single_stu = "";
+                    $prof_lists = explode(',', $single_data['prof']);
+                    foreach ($prof_lists as $single_prof) {
+                        $professor_name = explode('-', $single_prof)[0];
+                        $comment_id = explode('-', $single_prof)[1];
+                        $comment_status = explode('-', $single_prof)[2];
 
-                    // collect every comments' id of single student for better use
-                    $comment_ids_of_single_stu .= ($comment_ids_of_single_stu == "") ? $comment_id : ",$comment_id";
+                        // collect every comments' id of single student for better use
+                        $comment_ids_of_single_stu .= ($comment_ids_of_single_stu == "") ? $comment_id : ",$comment_id";
 
-                    // ($comment_status == 1): already commented
-                    $btn_css = ($comment_status == 1) ? 'btn-danger': 'btn-outline-secondary';
-                    $btn_title = ($comment_status == 1) ? '查看評論': '尚未評論';
-                    $btn_disabled = ($comment_status == 1) ? '': 'disabled';
+                        // ($comment_status == 1): already commented
+                        $btn_css = ($comment_status == 1) ? 'btn-danger': 'btn-outline-secondary';
+                        $btn_title = ($comment_status == 1) ? '查看評論': '尚未評論';
+                        $btn_disabled = ($comment_status == 1) ? '': 'disabled';
 ?>
                                     <form action="query.php" class="p-1">
                                         <input type="hidden" name="comments_id" value="<?php echo $comment_id; ?>">
                                         <input class="btn btn-sm <?php echo $btn_css; ?>" title="<?php echo $btn_title; ?>" <?php echo $btn_disabled; ?> type="submit" value="<?php echo $professor_name; ?>">
                                     </form>
 <?php
-                }
+                    }
 ?>
                                 </div>
                             </td>
                             <td class="p-2">
+<?php if ($semester_is_available): ?>
                                 <form class="p-1" onsubmit="return proposalRevoke('<?php echo $comment_ids_of_single_stu; ?>');">
                                     <input class="btn btn-sm btn-warning" type="submit" value="撤銷">
                                 </form>
+<?php else: ?>
+                                <b>(場次已關閉)</b>
+<?php endif; ?>
                             </td>
                         </tr>
 <?php
+                }
             }
 ?>
                     </tbody>
