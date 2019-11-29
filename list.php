@@ -311,15 +311,20 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                             </td>
                             <td style="min-width: 90px; max-width: 90px;">
 <?php
-                    $seperate_prof_id_teaching = explode("-",$student_prof_id_teaching); //回傳指導老師ID的陣列
-                    $tmp = [];
-                    for ($j = 0; $j < count($seperate_prof_id_teaching); $j++) {
-                        $get_prof_name = mysqli_query($conn,"SELECT `id`, `name` FROM `prof` WHERE `id` = '$seperate_prof_id_teaching[$j]'");
-                        while ($row2 = mysqli_fetch_row($get_prof_name)) {
-                            array_push($tmp, $row2[1]);
-                        }
-                    }                      
-                    echo implode("、", $tmp);
+                    if ($student_prof_id_teaching == 0) {
+                        echo '尚無資料';
+                    }
+                    else {
+                        $seperate_prof_id_teaching = explode("-",$student_prof_id_teaching); //回傳指導老師ID的陣列
+                        $tmp = [];
+                        for ($j = 0; $j < count($seperate_prof_id_teaching); $j++) {
+                            $get_prof_name = mysqli_query($conn,"SELECT `id`, `name` FROM `prof` WHERE `id` = '$seperate_prof_id_teaching[$j]'");
+                            while ($row2 = mysqli_fetch_row($get_prof_name)) {
+                                array_push($tmp, $row2[1]);
+                            }
+                        }                      
+                        echo implode("、", $tmp);
+                    }
 ?>
                             </td>
                             <td class="p-2">
