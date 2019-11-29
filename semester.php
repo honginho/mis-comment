@@ -54,7 +54,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                             }
                             else if (action == 'revoke' || action == 'recover') {
                                 settings.details = id;
-                                settings.explain = (action == 'revoke') ? '撤銷' : '復原';
+                                settings.explain = (action == 'revoke') ? '取消' : '復原';
 
                                 Swal.fire({
                                     title: `確定要<u>${settings.explain}</u>這個梯次嗎？`,
@@ -157,7 +157,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                             <td class="p-2">
                                 <form class="p-1" onsubmit="return false;">
 <?php if ($status): ?>
-                                    <input class="btn btn-sm btn-warning" type="button" value="撤銷" onclick="semesterAction('revoke', '<?php echo "$id,$name"; ?>')">
+                                    <input class="btn btn-sm btn-warning" type="button" value="取消" onclick="semesterAction('revoke', '<?php echo "$id,$name"; ?>')">
 <?php else: ?>
                                     <input class="btn btn-sm btn-primary" type="button" value="復原" onclick="semesterAction('recover', '<?php echo "$id,$name"; ?>')">
                                     <input class="btn btn-sm btn-danger" type="button" value="刪除" onclick="semesterAction('delete', '<?php echo $id; ?>')">
