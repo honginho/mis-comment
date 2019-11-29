@@ -34,9 +34,10 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">學生</th>
                             <th scope="col">學號</th>
+                            <th scope="col">學生</th>
                             <th scope="col">論文名稱</th>
+                            <th scope="col">指導老師</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -78,11 +79,25 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 $stmt->close();
                 $rows_data_stu = mysqli_num_rows($result_data_stu);
                 $stu = mysqli_fetch_assoc($result_data_stu);
+
+                // deal with `prof_id_teaching`
+                $seperate_prof_id_teaching = explode("-",$stu['prof_id_teaching']); //回傳指導老師ID的陣列
+                $tmp = [];
+                for($j=0;$j<count($seperate_prof_id_teaching);$j++)
+                {
+                    $get_prof_name = mysqli_query($conn,"SELECT `id`, `name` FROM `prof` WHERE `id` = '$seperate_prof_id_teaching[$j]'");
+                    while ($row2=mysqli_fetch_row($get_prof_name)){
+                        array_push($tmp,$row2[1]);
+                    }
+                }                      
+                $prof_name = implode("、",$tmp);
+
 ?>
                         <tr>
-                            <td><?php echo $stu['name']; ?></td>
                             <td><?php echo $stu['stu_id']; ?></td>
+                            <td><?php echo $stu['name']; ?></td>
                             <td><?php echo $stu['project']; ?></td>
+                            <td><?php echo $prof_name; ?></td>
                             <td style="padding: 0.5rem;">
                                 <form action="query.php">
                                     <input type="hidden" name="comments_id" value="<?php echo $id; ?>">

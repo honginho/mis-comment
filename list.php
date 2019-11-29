@@ -132,9 +132,11 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     <thead>
                         <tr>
                             <th scope="col">梯次</th>
+                            <th scope="col">學號</th>
                             <th scope="col">學生</th>
                             <th scope="col">論文名稱</th>
                             <th scope="col">評論教授</th>
+                            <th scope="col">指導教授</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -175,24 +177,24 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                      *   array(
                      *     [semester] => array(
                      *       array(
-                     *         stu => [student_name],
+                     *         stu => [student_name]-[student_id],
                      *         prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
                      *         project => [project_name]
                      *       ),
                      *       array(
-                     *         stu => [student_name],
+                     *         stu => [student_name]-[student_id],
                      *         prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
                      *         project => [project_name]
                      *       ),
                      *     ),
                      *     [semester] => array(
                      *       array(
-                     *         stu => [student_name],
+                     *         stu => [student_name]-[student_id],
                      *         prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
                      *         project => [project_name]
                      *       ),
                      *       array(
-                     *         stu => [student_name],
+                     *         stu => [student_name]-[student_id],
                      *         prof => [professor_name]-[comment_id]-[comment_status], [professor_name]-[comment_id]-[comment_status], ...... ,
                      *         project => [project_name]
                      *       ),
@@ -209,7 +211,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         $count = 0;
                         for ($j = 0; $j < $length_formatted_data; $j++) {
                             // need not push new formatted data while student name are duplicate
-                            if ($comments_formatted_data[$semester][$j]['stu'] == $stu['name']) {
+                            if ($comments_formatted_data[$semester][$j]['stu'] == $stu['name'] . '-' . $stu_id) {
                                 $comments_formatted_data[$semester][$j]['prof'] .= "," . $prof['name'] . "-$id-$status";
                                 break;
                             }
@@ -219,7 +221,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         // push new formatted data while student name aren't duplicate
                         if ($count == $length_formatted_data) {
                             $tmp['semester'] = $semester;
-                            $tmp['stu'] = $stu['name'];
+                            $tmp['stu'] = $stu['name'] . '-' . $stu_id;
                             $tmp['prof'] = $prof['name'] . "-$id-$status";
                             $tmp['project'] = $stu['project'];
                             array_push($comments_formatted_data[$semester], $tmp);
@@ -227,7 +229,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     }
                     else {
                         $tmp['semester'] = $semester;
-                        $tmp['stu'] = $stu['name'];
+                        $tmp['stu'] = $stu['name'] . '-' . $stu_id;
                         $tmp['prof'] = $prof['name'] . "-$id-$status";
                         $tmp['project'] = $stu['project'];
                         array_push($comments_formatted_data[$semester], $tmp);
@@ -239,7 +241,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 }
             }
 
-            // var_dump($semester_array); die();
+            // var_dump($comments_formatted_data); die();
 
             // render formatted data to frontend
             $semester_lists_array = array_keys($comments_formatted_data);
@@ -256,10 +258,29 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                 $semester_is_available = $single_semester['status'];
                 $semester_is_available_css = ($semester_is_available) ? 'opacity: 1' : 'opacity: .5';
                 foreach ($comments_formatted_data[$semester_lists_array[$i]] as $single_data) {
+                    $student_name = explode('-', $single_data['stu'])[0];
+                    $student_id = explode('-', $single_data['stu'])[1];
+
+                    $stmt = $conn->prepare('SELECT * FROM `stu` WHERE `id` = ?');
+                    $stmt->bind_param('i', $student_id);
+                    $stmt->execute();
+                    $result_data_student = $stmt->get_result();
+                    $stmt->close();
+                    $rows_data_student = mysqli_num_rows($result_data_student);
+                    $student = mysqli_fetch_assoc($result_data_student);
+
+                    if ($rows_data_student != 1) {
+                        die('系統出錯 - 272');
+                    }
+                    else {
+                        $student_stu_id = $student['stu_id'];
+                        $student_prof_id_teaching = $student['prof_id_teaching'];
+                    }
 ?>
                         <tr style="<?php echo $semester_is_available_css; ?>">
                             <td><?php echo $single_data['semester']; ?></td>
-                            <td><?php echo $single_data['stu']; ?></td>
+                            <td><?php echo $student_stu_id; ?></td>
+                            <td><?php echo $student_name; ?></td>
                             <td style="min-width: 150px;"><?php echo $single_data['project']; ?></td>
                             <td class="p-2">
                                 <div class="d-flex flex-wrap">
@@ -287,6 +308,19 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     }
 ?>
                                 </div>
+                            </td>
+                            <td style="min-width: 90px; max-width: 90px;">
+<?php
+                    $seperate_prof_id_teaching = explode("-",$student_prof_id_teaching); //回傳指導老師ID的陣列
+                    $tmp = [];
+                    for ($j = 0; $j < count($seperate_prof_id_teaching); $j++) {
+                        $get_prof_name = mysqli_query($conn,"SELECT `id`, `name` FROM `prof` WHERE `id` = '$seperate_prof_id_teaching[$j]'");
+                        while ($row2 = mysqli_fetch_row($get_prof_name)) {
+                            array_push($tmp, $row2[1]);
+                        }
+                    }                      
+                    echo implode("、", $tmp);
+?>
                             </td>
                             <td class="p-2">
 <?php if ($semester_is_available): ?>
