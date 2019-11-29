@@ -115,6 +115,11 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         return false;
                     }
                 </script>
+                <div class="alert alert-primary" role="alert">
+                    狀態開放：教授可以評論。
+                    <br>
+                    狀態關閉：教授無法評論，只有管理員可看見資料。
+                </div>
                 <form class="form-inline mb-3" onsubmit="return semesterAction('add');">
                     <div class="form-group mr-1 mr-sm-3">
                         <input type="text" class="form-control" name="semesterName" placeholder="限10個數字以內" required>
