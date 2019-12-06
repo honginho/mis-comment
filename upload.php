@@ -25,14 +25,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
 
         $target_semester = htmlspecialchars($_POST['targetSemester']);
 
-        $stmt = $conn->prepare('SELECT * FROM `semester` WHERE `status` = 1 AND `name` = ?');
-        $stmt->bind_param('s', $target_semester);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $stmt->close();
-        $rows = mysqli_num_rows($result);
-        if ($rows == 0)
-            die('請確認檔案內的學期是否相同且與上傳前選擇的學期相同。');
+        // $stmt = $conn->prepare('SELECT * FROM `semester` WHERE `status` = 1 AND `name` = ?');
+        // $stmt->bind_param('s', $target_semester);
+        // $stmt->execute();
+        // $result = $stmt->get_result();
+        // $stmt->close();
+        // $rows = mysqli_num_rows($result);
+        // if ($rows == 0)
+        //     die('請確認檔案內的學期是否相同且與上傳前選擇的學期相同。');
 
         // echo"<table>";
         // for($row = 2; $row <= $lastRow; $row++){                //從第3列開始顯示
@@ -63,10 +63,11 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
         $lastRow = $sheet->getHighestRow(); //取得總行數(橫)
 
         // TODO: check if `prof` exist and `stu` not exist
-
+        
         for($row = 3; $row <= $lastRow; $row++)
         {
-            if(trim($sheet->getCellByColumnAndRow(4, $row)->getValue())!="" && trim($sheet->getCellByColumnAndRow(4, $row)->getValue())!="撤銷場次") //忽略論文為空白值
+            
+            if(trim($sheet->getCellByColumnAndRow(4, $row)->getValue())!="" && mb_substr($sheet->getCellByColumnAndRow(4, $row)->getValue(),0,1,"utf-8") != "#") //忽略論文為空白值
             {  
                 $STU_ID = $sheet->getCell('C'.$row)->getValue();           //學號
                 $NAME = $sheet->getCell('D'.$row)->getValue();             //學生名字
@@ -76,7 +77,10 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
                 $PROF2 = trim($sheet->getCell('H'.$row)->getValue(),"*");
                 $PROF3 = trim($sheet->getCell('I'.$row)->getValue(),"*");
                 $PROF4 = trim($sheet->getCell('J'.$row)->getValue(),"*");
-                $PROF5 = trim($sheet->getCell('K'.$row)->getValue(),"*");  //與會老師們
+                $PROF5 = trim($sheet->getCell('K'.$row)->getValue(),"*");  
+                $PROF6 = trim($sheet->getCell('L'.$row)->getValue(),"*");
+                $PROF7 = trim($sheet->getCell('M'.$row)->getValue(),"*");  
+                $PROF8 = trim($sheet->getCell('N'.$row)->getValue(),"*");  //與會老師們
                 
                 // TODO: prepare statement
                 
@@ -117,11 +121,11 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
                         echo "教授名字:".$prof_name."<br>";
                         array_push($row_prof_id,$prof_name);        //將指導老師放進評論老師列中
                     }
-                    array_push($row_prof_id,$PROF1);
-                    array_push($row_prof_id,$PROF2);
-                    array_push($row_prof_id,$PROF3);
-                    array_push($row_prof_id,$PROF4);
-                    array_push($row_prof_id,$PROF5);
+                    for($col = 6; $col <= 13; $col++){
+                        $PROFS = trim($sheet->getCellByColumnAndRow($col, $row)->getValue(),"*");
+                        array_push($row_prof_id,$PROFS);
+                    }
+                    
 
                     $row_stu_id = $row3[0];
                     echo "學生ID:".$row3[0]."<br>";
