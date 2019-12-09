@@ -1,9 +1,3 @@
-<?php
-// session_start();
-require_once('connect.php');
-require_once('header.php');
-?>
-
 <div class="container">
     <div class="row justify-content-center">
         <div class="card text-center" style="width: 100%; max-width: 400px;">
@@ -51,27 +45,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['prof_id'] = $prof['id'];
             $_SESSION['account'] = $prof['name'];
             $_SESSION['level'] = $prof['level'];
-            // $_SESSION['login_user'] = $member['id'];
-            // $_SESSION['account'] = $member['number'];
-            // $_SESSION['auth'] = $member['authentication'];
-            // $now_time = htmlspecialchars(date("Y-m-d H:i:s"));
-            // $stmt = $conn->prepare("INSERT INTO login_time (name, auth, time) VALUES (?, ?, ?)");
-            // $stmt->bind_param('sis', $_SESSION['account'], $_SESSION['auth'], $now_time);
-            // $stmt->execute();
-            // $result = $stmt->get_result();
-            // $stmt->close();
         }
         else {
-            echo '沒有這個人啊。';
-            header("refresh: 0.5; url=./index.php", true, 301);
-            exit();
+            echo '帳號或密碼輸入錯誤。'; die();
+            // header("refresh: 0.5; url=./index.php", true, 301);
+            // exit();
         }
 
         mysqli_close($conn);
 
-        header("refresh: 0; url=./index.php", true, 301);
+        header("refresh: 0;");
         exit();
     }
 }
-
-require_once('footer.php');

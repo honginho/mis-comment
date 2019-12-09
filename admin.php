@@ -1,8 +1,4 @@
 <?php
-// session_start();
-require_once('connect.php');
-require_once('header.php');
-
 if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     if (isset($_SESSION['level']) && $_SESSION['level'] != 0) {
         echo '你不是管理員。';
@@ -118,6 +114,3 @@ else {
     header("refresh: 0; url=./login.php", true, 301);
     exit();
 }
-
-require_once('footer.php');
-
