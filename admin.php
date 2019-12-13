@@ -9,33 +9,6 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
         $prof_id = $_SESSION['prof_id'];
 ?>
     <script>
-        function getFileName() {
-            let filePath = $('#file').val(); // get the file name
-            let fileName = filePath.split('\\'); // get the file name
-            $('#file').next('.custom-file-label').html(fileName[fileName.length-1]); // replace the "Choose a file" label
-        }
-
-        function uploadFile() {
-            $.ajax({
-                type: 'POST',
-                url: 'upload.php',
-                cache: false,
-                data: new FormData($('#uploadForm')[0]),
-                processData: false,
-                contentType: false,
-                success: function (data) {
-                    if (data == 'success')
-                        Swal.fire('上傳成功', '', 'success').then(function () { location.reload(); });
-                    else
-                        Swal.fire('上傳失敗', '系統出錯，請聯絡系統管理員。', 'error').then(function () { console.log(data); });
-                },
-                error: function () {
-                    Swal.fire('上傳失敗', '系統出錯，請聯絡系統管理員。', 'error');
-                }
-            });
-
-            return false;
-        }
     </script>
 
     <div class="container">

@@ -8,34 +8,6 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     else {
 ?>
                 <script>
-                    function proposalRevoke(commentIds) {
-                        Swal.fire({
-                            title: '確定要撤銷這位學生的提案嗎？',
-                            text: "請注意，確定撤銷後將無法還原！",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: '確定',
-                            cancelButtonText: '取消',
-                        }).then(function (result) {
-                            if (result.value) {
-                                $.ajax({
-                                    type: 'POST',
-                                    url: 'proposalRevoke.php',
-                                    data: { comment_ids_of_single_stu: commentIds },
-                                    success: function (data) {
-                                        if (data == 'success')
-                                            Swal.fire('撤銷成功', '', 'success').then(function () { location.reload(); });
-                                        else
-                                            Swal.fire('撤銷失敗', '系統出錯，請聯絡系統管理員。', 'error').then(function () { console.log(data); });
-                                    },
-                                    error: function () {
-                                        Swal.fire('撤銷失敗', '系統出錯，請聯絡系統管理員。', 'error');
-                                    }
-                                });
-                            }
-                        });
-                        return false;
-                    }
                 </script>
                 <form class="form-inline mb-3" action="admin.php" method="GET">
                     <div class="form-group mr-1 mr-sm-3">
