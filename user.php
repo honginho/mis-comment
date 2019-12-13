@@ -139,6 +139,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     </thead>
                     <tbody>
 <?php
+        // list all professors' account
         $stmt = $conn->prepare('SELECT * FROM `prof` WHERE `level` = 1 ORDER BY `id` DESC');
         $stmt->execute();
         $result = $stmt->get_result();

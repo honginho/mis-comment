@@ -11,6 +11,8 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     else {
         if (isset($_POST['action']) && isset($_POST['details'])) {
             $action = htmlspecialchars(trim($_POST['action']));
+
+            // add professor
             if ($action == 'add') {
                 $prof_details = $_POST['details'][0];
 
@@ -35,6 +37,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     echo '!array';
                 }
             }
+            // update professor's password
             else if ($action == 'update') {
                 $prof_id = htmlspecialchars(trim($_POST['details'][0]));
                 $prof_password = htmlspecialchars(trim($_POST['details'][1]));
@@ -51,6 +54,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     echo 'some/all null';
                 }
             }
+            // delete account (delete professor)
             else if ($action == 'delete') {
                 $prof_id = htmlspecialchars(trim($_POST['details'][0]));
 

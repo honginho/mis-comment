@@ -11,18 +11,20 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
     else {
         if (isset($_POST['action']) && isset($_POST['details'])) {
             $action = htmlspecialchars(trim($_POST['action']));
+
+            // add semester
             if ($action == 'add') {
                 $semester_name = htmlspecialchars(trim($_POST['details']));
 
                 if ($semester_name != '') {
                     if (strlen($semester_name) <= 10) {
+                        // get semester to check if exist
                         $stmt = $conn->prepare('SELECT * FROM `semester` WHERE `name` = ?');
                         $stmt->bind_param('i', $semester_name);
                         $stmt->execute();
                         $result = $stmt->get_result();
                         $stmt->close();
-
-                        if (mysqli_num_rows($result) == 0) {
+                        if (mysqli_num_rows($result) == 0) { // unable to get semester => the semester is not exist
                             $stmt = $conn->prepare('INSERT INTO `semester` (`name`) VALUES (?)');
                             $stmt->bind_param('i', $semester_name);
                             $stmt->execute();
@@ -42,6 +44,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     echo 'null';
                 }
             }
+            // revoke semester
             else if ($action == 'revoke') {
                 $semester_id = explode(',', htmlspecialchars(trim($_POST['details'])))[0];
                 $semester_name = explode(',', htmlspecialchars(trim($_POST['details'])))[1];
@@ -58,6 +61,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 
                 echo 'success';
             }
+            // recover semester
             else if ($action == 'recover') {
                 $semester_id = explode(',', htmlspecialchars(trim($_POST['details'])))[0];
                 $semester_name = explode(',', htmlspecialchars(trim($_POST['details'])))[1];
@@ -74,6 +78,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 
                 echo 'success';
             }
+            // delete semester
             else if ($action == 'delete') {
                 $semester_id = htmlspecialchars(trim($_POST['details']));
 

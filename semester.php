@@ -11,18 +11,19 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     function semesterAction(action, id = 0) {
                         if (action != '') {
                             settings = {};
+                            // add semester
                             if (action == 'add') {
                                 settings.details = $('form input[name="semesterName"]').val();
                                 settings.explain = '新增';
 
-                                if (settings.details.length > 10) {
+                                if (settings.details.length > 10) { // foolproof
                                     Swal.fire(`${settings.explain}失敗`, '梯次名稱過長(限10個數字以內)，請重新輸入。', 'error')
                                         .then(function () {
                                             $('form input[name="semesterName"]').val('');
                                             setTimeout(function () { $('form input[name="semesterName"]').focus(); }, 500);
                                         });
                                 }
-                                else if (settings.details == '') {
+                                else if (settings.details == '') { // foolproof
                                     Swal.fire(`${settings.explain}失敗`, '請輸入梯次名稱。', 'error')
                                         .then(function () {
                                             $('form input[name="semesterName"]').val('');
@@ -52,6 +53,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                                     });
                                 }
                             }
+                            // revoke || recover semester
                             else if (action == 'revoke' || action == 'recover') {
                                 settings.details = id;
                                 settings.explain = (action == 'revoke') ? '取消' : '復原';
@@ -81,6 +83,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                                     }
                                 });
                             }
+                            // delete semester
                             else if (action == 'delete') {
                                 settings.details = id;
                                 settings.explain = '刪除';
@@ -139,6 +142,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     </thead>
                     <tbody>
 <?php
+        // list all semester
         $stmt = $conn->prepare('SELECT * FROM `semester`');
         $stmt->execute();
         $result = $stmt->get_result();
