@@ -16,6 +16,10 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
         　die ("Error: " . $_FILES["file"]["error"]);
         }
 
+        $current_semester =$_POST['targetSemester'];
+
+        // die();
+
         require_once "Classes/PHPExcel.php";
         $tmp_name = $_FILES["file"]["tmp_name"];
         $excelReader = PHPExcel_IOFactory::createReaderForFile($tmp_name);  //讀取excel檔案
@@ -99,7 +103,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
                         // var_dump($arr);
                     //}
                     $prof_id_teaching = implode("-",$arr);
-                    var_dump($prof_id_teaching)."<br>";
+                    // var_dump($prof_id_teaching)."<br>";
                 }
                 
                 //新增新同學資料
@@ -131,7 +135,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
                         $row_allprof_id = mysqli_query($conn,"SELECT `id`,`name` FROM `prof` WHERE `name` = '$row_prof_id[$i]'");
                         while ($row4=mysqli_fetch_row($row_allprof_id)){
                             $addcomment =
-                            "INSERT INTO `comments`(semester,prof_id,stu_id) VALUES(10806,$row4[0],$row_stu_id)
+                            "INSERT INTO `comments`(semester,prof_id,stu_id) VALUES($current_semester,$row4[0],$row_stu_id)
                             -- // ON DUPLICATE KEY
                             -- // UPDATE `stu_id`=$row3[0]";
 
