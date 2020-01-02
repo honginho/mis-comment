@@ -1,3 +1,5 @@
+var settings = {};
+
 function getFileName() {
     let filePath = $('#file').val(); // get the file name
     let fileName = filePath.split('\\'); // get the file name
