@@ -92,12 +92,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
                     $row2=mysqli_fetch_array($get_prof_teaching_id,MYSQLI_NUM);
                     
                     //echo '<br>';
-                    //var_dump($row2);                     //回傳array [0]:指導老師ID [1]:指導老師名字
-                    array_push($arr,$row2[0]);
-                    //echo '<br>';
-                    //var_dump($a);
+                    //if (count($get_prof_teaching) > 1) {
+                        // var_dump($get_prof_teaching);                     //回傳array [0]:指導老師ID [1]:指導老師名字
+                        array_push($arr,$row2[0]);
+                        // echo "\n";
+                        // var_dump($arr);
+                    //}
                     $prof_id_teaching = implode("-",$arr);
-                    echo $prof_id_teaching."<br>";
+                    var_dump($prof_id_teaching)."<br>";
                 }
                 
                 //新增新同學資料
@@ -106,21 +108,16 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
                         WHERE NOT EXISTS ( SELECT * FROM `stu` WHERE stu_id = '$STU_ID' OR project = '$PROJECT') LIMIT 1";
                         //過濾掉學號、論文名稱相同的資料以及論文是撤銷場次或空白
                         //https://stackoverflow.com/questions/3164505/mysql-insert-record-if-n-exists-in-table
-                //echo $add."<br>";
+                // echo $add."<br>";
                 mysqli_query($conn,$add);
                 // TODO: 印出有重複的給管理員看
 
-                //新增進comments資料表 (下面這一坨還沒好Q)
+                //新增進comments資料表
                 $get_stu_id = mysqli_query($conn,"SELECT `id`,`stu_id` FROM `stu` WHERE `stu_id` = '$STU_ID'");
                 $row_stu_id;
                 $row_prof_id = [];                                  //存放所有可評論老師
                 while ($row3=mysqli_fetch_row($get_stu_id))         //當有抓到學生資料時
                 {
-                    foreach($get_prof_teaching as $prof_name)   
-                    {
-                        echo "教授名字:".$prof_name."<br>";
-                        array_push($row_prof_id,$prof_name);        //將指導老師放進評論老師列中
-                    }
                     for($col = 6; $col <= 13; $col++){
                         $PROFS = trim($sheet->getCellByColumnAndRow($col, $row)->getValue(),"*");
                         array_push($row_prof_id,$PROFS);
@@ -128,14 +125,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '')
                     
 
                     $row_stu_id = $row3[0];
-                    echo "學生ID:".$row3[0]."<br>";
-                    echo "學生學號:".$row3[1]."<br>";
+                    // echo "學生ID:".$row3[0]."<br>";
+                    // echo "學生學號:".$row3[1]."<br>";
                     for($i=0;$i< count($row_prof_id);$i++){
                         $row_allprof_id = mysqli_query($conn,"SELECT `id`,`name` FROM `prof` WHERE `name` = '$row_prof_id[$i]'");
                         while ($row4=mysqli_fetch_row($row_allprof_id)){
                             $addcomment =
                             "INSERT INTO `comments`(semester,prof_id,stu_id) VALUES(10806,$row4[0],$row_stu_id)
-                            -- // ON DUPLICATE KEY 
+                            -- // ON DUPLICATE KEY
                             -- // UPDATE `stu_id`=$row3[0]";
 
                             // "INSERT IGNORE INTO `comments`(semester,prof_id,stu_id) VALUES(10806,$row4[0],$row_stu_id)";
