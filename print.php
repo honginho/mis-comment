@@ -43,10 +43,11 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             $rows_other_comment = mysqli_num_rows($result_status);
             $other_comment = mysqli_fetch_assoc($result_status);
 
+            $arr_all_eg_comments = array();
             if($commented == 1){
                 for($j = 1 ; $j<count($comment_id) ; $j++) {
                     $sql_comments_content = "SELECT prof_id,stu_id,comment,other_comment FROM comments WHERE id = '$comment_id[$j]' AND status = 1;";
-                
+                    
                     $result = $conn->query($sql_comments_content);
                     if($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
