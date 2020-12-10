@@ -9,9 +9,9 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 ?>
                 <script>
                 </script>
-                <form class="form-inline mb-3" action="admin.php" method="GET">
+                <form class="form-inline mb-3"  method="GET">
                     <div class="form-group mr-1 mr-sm-3">
-                        <input type="text" class="form-control" name="condition_all" placeholder="請輸入關鍵字">
+                        <input type="text" class="form-control" name="condition_all" placeholder="請輸入關鍵字" required>
                     </div>
                     <div class="form-group" style="display:inline;">
                         <input class="btn btn-success" type="submit" value="查詢學生或教授">
@@ -259,10 +259,17 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 <?php
                     $comment_ids_of_single_stu = "";
                     $prof_lists = explode(',', $single_data['prof']);
+
+                    // hhhhhhhhhhhhhhhhhhhhhhhhhh
+                    $comment_id_to_print = $student_name;
+
                     foreach ($prof_lists as $single_prof) {
                         $professor_name = explode('-', $single_prof)[0];
                         $comment_id = explode('-', $single_prof)[1];
                         $comment_status = explode('-', $single_prof)[2];
+
+                        // hhhhhhhhhhhhhhhhhhhhhhhhhh
+                        $comment_id_to_print .= ",$comment_id";
 
                         // collect every comments' id of single student for better use
                         $comment_ids_of_single_stu .= ($comment_ids_of_single_stu == "") ? $comment_id : ",$comment_id";
@@ -307,6 +314,12 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 <?php else: ?>
                                 <b>(梯次已關閉)</b>
 <?php endif; ?>
+                            </td>
+                            <td class="p-2">
+                                <form class="p-1" method = 'POST' action = 'print.php'  target='_blank' onsubmit="<?php echo $comment_id_to_print; ?>);">
+                                    <input type="hidden" name="comment_id_to_print" value="<?php echo $comment_id_to_print; ?>">
+                                    <input class="btn btn-sm btn-info" type="submit" onclick="printdiv('div_print_all')" value="列印">
+                                </form>
                             </td>
                         </tr>
 <?php

@@ -16,9 +16,10 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <b>國立中正大學資管所&醫管所論文提案書評論系統</b>
-                <form action="logout.php" method="POST">
+                <form class="p-1" action="logout.php" method="POST">
                     <input type="button" class="btn btn-sm btn-light" value="<?php echo $_SESSION['account']; ?>" disabled>
                     <input type="submit" class="btn btn-sm btn-danger" value="登出">
+                    <input class="btn btn-sm btn-warning" type="button" value="修改密碼" onclick="userAction('update', '<?php echo $prof_id; ?>')">
                 </form>
             </div>
             <div class="card-body table-responsive">

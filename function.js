@@ -287,3 +287,13 @@ function userUpdate(id) {
         }
     });
 }
+
+function printdiv(printpage)
+{
+    var headstr = "<html><head><title></title></head><body>";
+    var footstr = "</body>";
+    var newstr = document.all.item(printpage).innerHTML;
+    document.body.innerHTML = headstr+newstr+footstr;
+    window.print();
+    location.reload();
+} //列印

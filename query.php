@@ -98,14 +98,14 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
 
     <div class="modal fade" id="checkModal" tabindex="-1" role="dialog" aria-labelledby="checkModal" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
+            <div class="modal-content" id="div_print">
                 <div class="modal-header">
                     <h5 class="modal-title">評論確認</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" >
                     <form id="form-check-comments" action="comments.php" method="POST">
                         <!-- <div class="form-row">
                             <input type="hidden" name="comments_id" value="5">
@@ -142,7 +142,9 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">繼續修改</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">繼續修改</button>                    
+                    <input type="button" class="btn btn-info" onclick="printdiv('div_print')" value="列印">
+                    
 <?php if ($_SESSION['level'] == 1): ?>
                     <button type="button" class="btn btn-success" onclick="$('#form-check-comments').submit();">確定儲存</button>
 <?php endif; ?>
@@ -243,9 +245,13 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                     點選以選取評論範例。
                 </div>
 <?php endif; ?>
+                <script>
+                    console.log(`<?php print_r($arr_comments_all) ?>`);
+                </script>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
 <?php
+            // 先處理各類標題
             for ($i = 0; $i < count($arr_comments_all); $i++) {
                 $m = $arr_comments_all[$i][0][0]; // `main`
                 $s = $arr_comments_all[$i][0][1]; // `sub`

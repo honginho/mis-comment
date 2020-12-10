@@ -3,7 +3,7 @@ session_start();
 require_once('connect.php');
 
 if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
-    if (isset($_SESSION['level']) && $_SESSION['level'] != 0) {
+    if (!isset($_SESSION['level'])) {
         echo '你不是管理員。';
         header("refresh: 0.5; url=./index.php", true, 301);
         exit();
@@ -13,7 +13,7 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             $action = htmlspecialchars(trim($_POST['action']));
 
             // add professor
-            if ($action == 'add') {
+            if ($action == 'add' && $_SESSION['level'] == 0) {
                 $prof_details = $_POST['details'][0];
 
                 if (is_array($prof_details)) {
@@ -41,21 +41,49 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
             else if ($action == 'update') {
                 $prof_id = htmlspecialchars(trim($_POST['details'][0]));
                 $prof_password = htmlspecialchars(trim($_POST['details'][1]));
-
-                if ($prof_id != '' && $prof_password != '') {
-                    $stmt = $conn->prepare('UPDATE `prof` SET `password` = ? WHERE `id` = ?');
-                    $stmt->bind_param('si', $prof_password, $prof_id);
-                    $stmt->execute();
-                    $stmt->close();
-
-                    echo 'success';
+                if($_SESSION['level'] == 0){    //管理員可直接改
+                    if ($prof_id != '' && $prof_password != '') {
+                        $stmt = $conn->prepare('UPDATE `prof` SET `password` = ? WHERE `id` = ?');
+                        $stmt->bind_param('si', $prof_password, $prof_id);
+                        $stmt->execute();
+                        $stmt->close();
+    
+                        echo 'success';
+                    }
+                    else {                      
+                        echo 'some/all null';
+                    }
                 }
-                else {
-                    echo 'some/all null';
+                else{                           
+                    if($prof_id == $_SESSION['prof_id']){ //檢查前端傳回的ID是否等於教授ID
+                        if ($prof_id != '' && $prof_password != '') {
+                            $stmt = $conn->prepare('UPDATE `prof` SET `password` = ? WHERE `id` = ?');
+                            $stmt->bind_param('si', $prof_password, $prof_id);
+                            $stmt->execute();
+                            $stmt->close();
+
+                            echo 'success';
+                        }
+                        else {                      
+                            echo 'some/all null';
+                        }
+                    }
+                    else{
+                        echo '
+                        <script type="text/javascript">
+                        $(document).ready(function(){
+                            Swal.fire("更新失敗", "系統出錯，請聯絡系統管理員。", "error");
+                        });
+
+                        </script>
+                        ';
+                        
+                    }
                 }
+                
             }
             // delete account (delete professor)
-            else if ($action == 'delete') {
+            else if ($action == 'delete' && $_SESSION['level'] == 0) {
                 $prof_id = htmlspecialchars(trim($_POST['details'][0]));
 
                 if ($prof_id != '') {

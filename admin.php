@@ -42,6 +42,9 @@ if (isset($_SESSION['prof_id']) && trim($_SESSION['prof_id'] ) != '') {
                         <?php include_once('semester.php'); ?>
                     </div>
                     <div class="tab-pane fade" id="nav-upload" role="tabpanel" aria-labelledby="nav-upload-tab">
+                        <div   div class="alert alert-primary" role="alert">
+                            <a href="提案格式範例.xlsx" download="提案格式範例.xlsx">碩論提案格式範例下載</a>
+                        </div>
                         <form id="uploadForm" class="d-flex" enctype="multipart/form-data" onsubmit="return uploadFile();">
                             <select name="targetSemester" class="custom-select" style="max-width: 110px; min-width: 110px;" required>
                                 <option value="">選擇學期</option>
